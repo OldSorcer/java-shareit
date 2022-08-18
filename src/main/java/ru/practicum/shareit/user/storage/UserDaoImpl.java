@@ -31,19 +31,13 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public void deleteUserById(Long userId) {
-        User deletedUser = users.remove(userId);
-        if (Objects.isNull(deletedUser)) {
-            throw new NoSuchElementException(String.format("Пользователя с ID %d не существует", userId));
-        }
+    public Optional<User> deleteUserById(Long userId) {
+        return Optional.ofNullable(users.remove(userId));
     }
 
     @Override
-    public User findByUserId(Long userId) {
-        return users.values().stream()
-                .filter(u -> u.getId().equals(userId))
-                .findFirst()
-                .orElseThrow(() -> new NoSuchElementException(String.format("Пользователь с ID %d не найден", userId)));
+    public Optional<User> findByUserId(Long userId) {
+        return Optional.ofNullable(users.get(userId));
     }
 
     @Override
@@ -59,7 +53,9 @@ public class UserDaoImpl implements UserDao {
     }
 
     private User setUserStatement(Long userId, User user) {
-        User foundedUser = findByUserId(userId);
+        User foundedUser = findByUserId(userId)
+                .orElseThrow(() -> new NoSuchElementException(String.format("Пользователь с ID %d не существует",
+                        userId)));
         if (Objects.nonNull(user.getName()) && !user.getName().isBlank()) {
             foundedUser.setName(user.getName());
         }

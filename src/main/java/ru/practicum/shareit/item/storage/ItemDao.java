@@ -3,11 +3,13 @@ package ru.practicum.shareit.item.storage;
 import ru.practicum.shareit.item.model.Item;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ItemDao {
     Item createItem(Item item);
-    Item updateItem(Item item);
-    void deleteItemById(Long itemId);
+    Item updateItem(Long itemId, Item item);
+    Optional<Item> deleteItemById(Long itemId);
     List<Item> getItemsByOwnerId(Long ownerId);
-    Item getItemById(Long itemId);
+    Optional<Item> getItemById(Long itemId);
+    List<Item> getAllItems();
 }
