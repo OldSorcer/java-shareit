@@ -3,10 +3,7 @@ package ru.practicum.shareit.user.storage;
 import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.user.model.User;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Objects;
+import java.util.*;
 
 @Repository
 public class UserDaoImpl implements UserDao {
@@ -47,6 +44,11 @@ public class UserDaoImpl implements UserDao {
                 .filter(u -> u.getId().equals(userId))
                 .findFirst()
                 .orElseThrow(() -> new NoSuchElementException(String.format("Пользователь с ID %d не найден", userId)));
+    }
+
+    @Override
+    public List<User> getAllUsers() {
+        return List.copyOf(users.values());
     }
 
     private void checkDuplicateEmail(String email) {
