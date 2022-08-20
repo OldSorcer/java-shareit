@@ -2,7 +2,7 @@ package ru.practicum.shareit.item.dto;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.practicum.shareit.Create;
+import ru.practicum.shareit.validator.groups.Create;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.requests.model.ItemRequest;
 

@@ -7,7 +7,6 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.storage.UserDao;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @AllArgsConstructor
 @Service

@@ -33,7 +33,7 @@ public class ItemDaoImpl implements ItemDao {
 
     @Override
     public Optional<Item> deleteItemById(Long itemId) {
-         return Optional.ofNullable(items.remove(itemId));
+        return Optional.ofNullable(items.remove(itemId));
     }
 
     @Override

@@ -51,7 +51,8 @@ public class UserDaoImpl implements UserDao {
     }
 
     private void checkDuplicateEmail(String email) {
-        boolean isDuplicated = users.values().stream().anyMatch(u -> u.getEmail().equals(email));
+        boolean isDuplicated = users.values().stream()
+                .anyMatch(u -> u.getEmail().equals(email));
         if (isDuplicated) {
             throw new InvalidArgumentException(String.format("Пользователь с e-mail %s уже существует", email));
         }

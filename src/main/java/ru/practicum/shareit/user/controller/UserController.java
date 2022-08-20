@@ -3,7 +3,7 @@ package ru.practicum.shareit.user.controller;
 import lombok.AllArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.Create;
+import ru.practicum.shareit.validator.groups.Create;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserDtoMapper;
 import ru.practicum.shareit.user.model.User;
@@ -40,7 +40,9 @@ public class UserController {
 
     @GetMapping
     public List<UserDto> getAllUsers() {
-        return userService.getAllUsers().stream().map(UserDtoMapper::toUserDto).collect(Collectors.toList());
+        return userService.getAllUsers().stream()
+                .map(UserDtoMapper::toUserDto)
+                .collect(Collectors.toList());
     }
 
     @DeleteMapping("/{userId}")
