@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item.storage;
 
 import org.springframework.stereotype.Repository;
+import ru.practicum.shareit.exception.EntityNotFoundException;
 import ru.practicum.shareit.item.model.Item;
 
 import java.util.*;
@@ -16,15 +17,16 @@ public class ItemDaoImpl implements ItemDao {
         this.idCounter = 0L;
     }
     @Override
-    public Item createItem(Item item) {
+    public Item createItem(Item item, Long ownerId) {
         item.setId(++idCounter);
+        item.setOwner(ownerId);
         items.put(idCounter, item);
         return item;
     }
 
     @Override
-    public Item updateItem(Long itemId, Item item) {
-        Item updatedItem = setItemStatement(itemId, item);
+    public Item updateItem(Long itemId, Item item, Long ownerId) {
+        Item updatedItem = setItemStatement(itemId, item, ownerId);
         items.put(itemId, updatedItem);
         return updatedItem;
     }
@@ -51,9 +53,21 @@ public class ItemDaoImpl implements ItemDao {
         return List.copyOf(items.values());
     }
 
-    private Item setItemStatement(Long itemId, Item item) {
+    @Override
+    public List<Item> searchBy(String word) {
+        return items.values().stream()
+                .filter(i -> i.getName().toLowerCase().contains(word)
+                        || i.getDescription().toLowerCase().contains(word)).filter(Item::getAvailable)
+                .collect(Collectors.toList());
+    }
+
+    private Item setItemStatement(Long itemId, Item item, Long ownerId) {
         Item foundedItem = getItemById(itemId)
-                .orElseThrow(() -> new NoSuchElementException(String.format("Предмета с ID %d не существует", itemId)));
+                .orElseThrow(() -> new EntityNotFoundException(String.format("Предмета с ID %d не существует", itemId)));
+        if (!foundedItem.getOwner().equals(ownerId)) {
+            throw new EntityNotFoundException(String.format("Вещь с ID %d и ID владельца %d не найдена",
+                    itemId, ownerId));
+        }
         if (Objects.nonNull(item.getName()) && !item.getName().isBlank()) {
             foundedItem.setName(item.getName());
         }

@@ -2,8 +2,8 @@ package ru.practicum.shareit.user.service;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.exception.EntityNotFoundException;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.service.UserService;
 import ru.practicum.shareit.user.storage.UserDao;
 
 import java.util.List;
@@ -22,7 +22,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getUserById(Long userId) {
         return userDao.findByUserId(userId)
-                .orElseThrow(() -> new NoSuchElementException(String.format("Пользователь с ID %d не найден", userId)));
+                .orElseThrow(() -> new EntityNotFoundException(String.format("Пользователь с ID %d не найден", userId)));
     }
 
     @Override
@@ -33,7 +33,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteUserById(Long userId) {
         userDao.deleteUserById(userId)
-                .orElseThrow(() -> new NoSuchElementException(String.format("Пользователь с ID %d не найден", userId)));
+                .orElseThrow(() -> new EntityNotFoundException(String.format("Пользователь с ID %d не найден", userId)));
     }
 
     @Override

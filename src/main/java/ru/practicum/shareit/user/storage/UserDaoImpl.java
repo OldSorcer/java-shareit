@@ -1,6 +1,8 @@
 package ru.practicum.shareit.user.storage;
 
 import org.springframework.stereotype.Repository;
+import ru.practicum.shareit.exception.EntityNotFoundException;
+import ru.practicum.shareit.exception.InvalidArgumentException;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.*;
@@ -25,6 +27,9 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public User updateUser(Long userId, User user) {
+        if (Objects.nonNull(user.getEmail())) {
+            checkDuplicateEmail(user.getEmail());
+        }
         User userForUpdate = setUserStatement(userId, user);
         users.put(userId, userForUpdate);
         return userForUpdate;
@@ -46,15 +51,15 @@ public class UserDaoImpl implements UserDao {
     }
 
     private void checkDuplicateEmail(String email) {
-        boolean isDuplicated = users.values().stream().noneMatch(u -> u.getEmail().equals(email));
+        boolean isDuplicated = users.values().stream().anyMatch(u -> u.getEmail().equals(email));
         if (isDuplicated) {
-            throw new IllegalArgumentException(String.format("Пользователь с e-mail %s уже существует", email));
+            throw new InvalidArgumentException(String.format("Пользователь с e-mail %s уже существует", email));
         }
     }
 
     private User setUserStatement(Long userId, User user) {
         User foundedUser = findByUserId(userId)
-                .orElseThrow(() -> new NoSuchElementException(String.format("Пользователь с ID %d не существует",
+                .orElseThrow(() -> new EntityNotFoundException(String.format("Пользователь с ID %d не существует",
                         userId)));
         if (Objects.nonNull(user.getName()) && !user.getName().isBlank()) {
             foundedUser.setName(user.getName());

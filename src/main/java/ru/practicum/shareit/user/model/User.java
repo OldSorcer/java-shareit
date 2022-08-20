@@ -3,6 +3,7 @@ package ru.practicum.shareit.user.model;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.practicum.shareit.Create;
+import ru.practicum.shareit.user.dto.UserDto;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -22,4 +23,10 @@ public class User {
     @NotBlank(groups = {Create.class})
     @Email(groups = {Create.class})
     private String email;
+
+    public User(UserDto userDto) {
+        this.id = userDto.getId();
+        this.name = userDto.getName();
+        this.email = userDto.getEmail();
+    }
 }

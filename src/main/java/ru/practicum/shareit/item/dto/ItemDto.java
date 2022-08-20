@@ -3,6 +3,7 @@ package ru.practicum.shareit.item.dto;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.practicum.shareit.Create;
+import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.requests.model.ItemRequest;
 
 import javax.validation.constraints.NotBlank;
@@ -25,4 +26,13 @@ public class ItemDto {
     private Boolean available;
     private Long owner;
     private ItemRequest request;
+
+    public ItemDto(Item item) {
+        this.id = item.getId();
+        this.name = item.getName();
+        this.description = item.getDescription();
+        this.available = item.getAvailable();
+        this.owner = item.getOwner();
+        this.request = item.getRequest();
+    }
 }
