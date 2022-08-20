@@ -21,7 +21,7 @@ public class UserDto {
     @Email(groups = {Create.class})
     private String email;
 
-    public UserDto (User user) {
+    public UserDto(User user) {
         this.id = user.getId();
         this.name = user.getName();
         this.email = user.getEmail();

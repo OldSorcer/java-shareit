@@ -9,13 +9,14 @@ import java.util.stream.Collectors;
 
 @Repository
 public class ItemDaoImpl implements ItemDao {
-    private Map<Long, Item> items;
+    private final Map<Long, Item> items;
     private Long idCounter;
 
     public ItemDaoImpl() {
         this.items = new HashMap<>();
         this.idCounter = 0L;
     }
+
     @Override
     public Item createItem(Item item, Long ownerId) {
         item.setId(++idCounter);
