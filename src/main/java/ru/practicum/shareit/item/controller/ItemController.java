@@ -20,10 +20,11 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class ItemController {
     private final ItemService itemService;
+    private final static String USER_ID_HEADER = "X-Sharer-User-Id";
 
     @PostMapping
     public ItemDto createItem(@RequestBody @Validated({Create.class}) ItemDto itemDto,
-                              @RequestHeader("X-Sharer-User-Id") Long ownerId) {
+                              @RequestHeader(USER_ID_HEADER) Long ownerId) {
         Item createdItem = itemService.createItem(ItemDtoMapper.toItem(itemDto), ownerId);
         return ItemDtoMapper.toItemDto(createdItem);
     }
@@ -31,7 +32,7 @@ public class ItemController {
     @PatchMapping("/{itemId}")
     public ItemDto updateItem(@PathVariable Long itemId,
                               @RequestBody ItemDto itemDto,
-                              @RequestHeader("X-Sharer-User-Id") Long ownerId) {
+                              @RequestHeader(USER_ID_HEADER) Long ownerId) {
         Item updatedItem = itemService.updateItem(itemId, ItemDtoMapper.toItem(itemDto), ownerId);
         return ItemDtoMapper.toItemDto(updatedItem);
     }
@@ -42,16 +43,12 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<ItemDto> getItemsByOwnerId(@RequestHeader("X-Sharer-User-Id") Long ownerId) {
-        return itemService.getItemByOwnerId(ownerId).stream()
-                .map(ItemDtoMapper::toItemDto)
-                .collect(Collectors.toList());
+    public List<ItemDto> getItemsByOwnerId(@RequestHeader(USER_ID_HEADER) Long ownerId) {
+        return itemService.getItemByOwnerId(ownerId);
     }
 
     @GetMapping("/search")
     public List<ItemDto> searchBy(@RequestParam String text) {
-        return itemService.searchBy(text).stream()
-                .map(ItemDtoMapper::toItemDto)
-                .collect(Collectors.toList());
+        return itemService.searchBy(text);
     }
 }

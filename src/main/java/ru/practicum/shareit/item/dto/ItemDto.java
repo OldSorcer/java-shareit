@@ -1,5 +1,7 @@
 package ru.practicum.shareit.item.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.practicum.shareit.validator.groups.Create;
@@ -13,7 +15,9 @@ import javax.validation.constraints.NotNull;
  * // TODO .
  */
 @Data
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 public class ItemDto {
     private Long id;
     @NotNull(groups = {Create.class})
@@ -26,13 +30,4 @@ public class ItemDto {
     private Boolean available;
     private Long owner;
     private ItemRequest request;
-
-    public ItemDto(Item item) {
-        this.id = item.getId();
-        this.name = item.getName();
-        this.description = item.getDescription();
-        this.available = item.getAvailable();
-        this.owner = item.getOwner();
-        this.request = item.getRequest();
-    }
 }

@@ -57,9 +57,14 @@ public class ItemDaoImpl implements ItemDao {
     @Override
     public List<Item> searchBy(String word) {
         return items.values().stream()
-                .filter(i -> i.getName().toLowerCase().contains(word)
-                        || i.getDescription().toLowerCase().contains(word)).filter(Item::getAvailable)
+                .filter(i -> isContainText(i.getName(), word)
+                        || isContainText(i.getDescription(), word))
+                .filter(Item::getAvailable)
                 .collect(Collectors.toList());
+    }
+
+    private boolean isContainText(String text, String word) {
+        return text.toLowerCase().contains(word);
     }
 
     private Item setItemStatement(Long itemId, Item item, Long ownerId) {
