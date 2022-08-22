@@ -3,14 +3,13 @@ package ru.practicum.shareit.item.controller;
 import lombok.AllArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.validator.groups.Create;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemDtoMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
+import ru.practicum.shareit.validator.groups.Create;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * // TODO .
@@ -19,8 +18,8 @@ import java.util.stream.Collectors;
 @RequestMapping("/items")
 @AllArgsConstructor
 public class ItemController {
+    private static final String USER_ID_HEADER = "X-Sharer-User-Id";
     private final ItemService itemService;
-    private final static String USER_ID_HEADER = "X-Sharer-User-Id";
 
     @PostMapping
     public ItemDto createItem(@RequestBody @Validated({Create.class}) ItemDto itemDto,

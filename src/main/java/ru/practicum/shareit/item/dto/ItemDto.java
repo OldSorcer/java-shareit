@@ -4,9 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.practicum.shareit.validator.groups.Create;
-import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.requests.model.ItemRequest;
+import ru.practicum.shareit.validator.groups.Create;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
