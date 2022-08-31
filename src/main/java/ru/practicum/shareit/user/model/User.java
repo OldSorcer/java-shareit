@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import ru.practicum.shareit.validator.groups.Create;
 import ru.practicum.shareit.user.dto.UserDto;
 
+import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -14,7 +15,11 @@ import javax.validation.constraints.NotNull;
  */
 @Data
 @NoArgsConstructor
+@Entity
+@Table(name = "users")
 public class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @NotNull(groups = {Create.class})
     @NotBlank(groups = {Create.class})
