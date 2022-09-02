@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.EntityNotFoundException;
 import ru.practicum.shareit.exception.InvalidArgumentException;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.storage.UserDao;
 import ru.practicum.shareit.user.storage.UserRepository;
 
 import java.util.List;
