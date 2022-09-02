@@ -3,40 +3,64 @@ package ru.practicum.shareit.user.service;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.EntityNotFoundException;
+import ru.practicum.shareit.exception.InvalidArgumentException;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.storage.UserDao;
+import ru.practicum.shareit.user.storage.UserRepository;
 
 import java.util.List;
+import java.util.Objects;
 
 @AllArgsConstructor
 @Service
 public class UserServiceImpl implements UserService {
-    private final UserDao userDao;
+    private final UserRepository userRepository;
 
     @Override
     public User createUser(User user) {
-        return userDao.createUser(user);
+        checkEmail(user.getEmail());
+        return userRepository.save(user);
     }
 
     @Override
     public User getUserById(Long userId) {
-        return userDao.findByUserId(userId)
-                .orElseThrow(() -> new EntityNotFoundException(String.format("Пользователь с ID %d не найден", userId)));
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException(String.format("Пользователя с ID %d не существует",
+                        userId)));
     }
 
     @Override
     public List<User> getAllUsers() {
-        return userDao.getAllUsers();
+        return userRepository.findAll();
     }
 
     @Override
     public void deleteUserById(Long userId) {
-        userDao.deleteUserById(userId)
-                .orElseThrow(() -> new EntityNotFoundException(String.format("Пользователь с ID %d не найден", userId)));
+        userRepository.deleteById(userId);
     }
 
     @Override
     public User updateUser(Long userId, User user) {
-        return userDao.updateUser(userId, user);
+        User updatedUser = setStatement(userId, user);
+        return userRepository.save(updatedUser);
+    }
+
+    private void checkEmail(String email) {
+        boolean isDuplicate = userRepository.findByEmailContainsIgnoreCase(email).isPresent();
+        if (isDuplicate) {
+            throw new InvalidArgumentException("Пользователь с таким email уже существует");
+        }
+    }
+
+    private User setStatement(Long userId, User user) {
+        User updatedUser = getUserById(userId);
+        if (Objects.nonNull(user.getName())) {
+            updatedUser.setName(user.getName());
+        }
+        if (Objects.nonNull(user.getEmail())) {
+            updatedUser.setEmail(user.getEmail());
+        }
+        updatedUser.setId(userId);
+        return updatedUser;
     }
 }

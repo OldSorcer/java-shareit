@@ -1,5 +1,6 @@
 package ru.practicum.shareit.exception.handler;
 
+import org.springframework.boot.context.properties.bind.validation.ValidationErrors;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -7,6 +8,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.practicum.shareit.exception.EntityNotFoundException;
 import ru.practicum.shareit.exception.InvalidArgumentException;
 
+import javax.validation.ValidationException;
 import java.util.Map;
 
 @RestControllerAdvice
