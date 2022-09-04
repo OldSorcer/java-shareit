@@ -55,12 +55,12 @@ public class BookingController {
     @GetMapping
     public List<BookingDto> getBookings(@RequestParam(defaultValue = "ALL", required = false) BookingState state,
                                         @RequestHeader(USER_ID_HEADER) Long userID) {
-        return bookingService.getBookings(state, userID).stream().map(BookingDtoMapper::toBookingDto).collect(Collectors.toList());
+        return BookingDtoMapper.toBookingDto(bookingService.getBookings(state, userID));
     }
 
     @GetMapping("/owner")
     public List<BookingDto> getBookingsByOwnerId(@RequestParam(defaultValue = "ALL", required = false) BookingState state,
                                                  @RequestHeader(USER_ID_HEADER) Long userId) {
-        return bookingService.getBookingsByOwnerId(state, userId).stream().map(BookingDtoMapper::toBookingDto).collect(Collectors.toList());
+        return BookingDtoMapper.toBookingDto(bookingService.getBookingsByOwnerId(state, userId));
     }
 }

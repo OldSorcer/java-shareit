@@ -44,11 +44,11 @@ public class ItemController {
 
     @GetMapping
     public List<ItemDto> getItemsByOwnerId(@RequestHeader(USER_ID_HEADER) Long ownerId) {
-        return itemService.getItemByOwnerId(ownerId);
+        return ItemDtoMapper.toItemDto(itemService.getItemByOwnerId(ownerId));
     }
 
     @GetMapping("/search")
     public List<ItemDto> searchBy(@RequestParam String text) {
-        return itemService.searchBy(text);
+        return ItemDtoMapper.toItemDto(itemService.searchBy(text));
     }
 }

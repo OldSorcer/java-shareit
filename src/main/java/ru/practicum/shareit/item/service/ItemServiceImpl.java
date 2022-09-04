@@ -54,10 +54,9 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> getItemByOwnerId(Long ownerId) {
+    public List<Item> getItemByOwnerId(Long ownerId) {
         checkUser(ownerId);
-        List<Item> items = itemRepository.findByOwnerId(ownerId);
-        return items.stream().map(ItemDtoMapper::toItemDto).collect(Collectors.toList());
+        return itemRepository.findByOwnerId(ownerId);
     }
 
     @Override
@@ -67,11 +66,11 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> searchBy(String word) {
+    public List<Item> searchBy(String word) {
         if (word.isEmpty() || word.isBlank()) {
             return new ArrayList<>();
         }
-        return itemRepository.searchBy(word).stream().map(ItemDtoMapper::toItemDto).collect(Collectors.toList());
+        return itemRepository.searchBy(word);
     }
 
     private User checkUser(Long userId) {

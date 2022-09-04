@@ -4,6 +4,7 @@ import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.item.model.Item;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public final class ItemDtoMapper {
     public static ItemDto toItemDto(Item item) {
@@ -26,6 +27,10 @@ public final class ItemDtoMapper {
                 .available(itemDto.getAvailable())
                 .request(itemDto.getRequest())
                 .build();
+    }
+
+    public static List<ItemDto> toItemDto(List<Item> items) {
+        return items.stream().map(ItemDtoMapper::toItemDto).collect(Collectors.toList());
     }
 
     public static ItemInfoDto toItemInfoDto(Item item, List<Booking> bookings) {
