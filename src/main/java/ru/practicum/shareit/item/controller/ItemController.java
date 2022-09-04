@@ -3,6 +3,8 @@ package ru.practicum.shareit.item.controller;
 import lombok.AllArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemDtoMapper;
 import ru.practicum.shareit.item.dto.ItemInfoDto;
@@ -21,6 +23,7 @@ import java.util.List;
 public class ItemController {
     private static final String USER_ID_HEADER = "X-Sharer-User-Id";
     private final ItemService itemService;
+    private final BookingService bookingService;
 
     @PostMapping
     public ItemDto createItem(@RequestBody @Validated({Create.class}) ItemDto itemDto,
@@ -38,17 +41,18 @@ public class ItemController {
     }
 
     @GetMapping("/{itemId}")
-    public ItemDto getItemById(@PathVariable Long itemId) {
-        return ItemDtoMapper.toItemDto(itemService.getItemById(itemId));
+    public ItemInfoDto getItemById(@PathVariable Long itemId, @RequestHeader(USER_ID_HEADER) Long userId) {
+        return ItemDtoMapper.toItemInfoDto(itemService.getItemById(itemId), bookingService, userId);
     }
 
     @GetMapping
-    public List<ItemDto> getItemsByOwnerId(@RequestHeader(USER_ID_HEADER) Long ownerId) {
-        return ItemDtoMapper.toItemDto(itemService.getItemByOwnerId(ownerId));
+    public List<ItemInfoDto> getItemsByOwnerId(@RequestHeader(USER_ID_HEADER) Long ownerId) {
+        List<Item> items = itemService.getItemByOwnerId(ownerId);
+        return ItemDtoMapper.toItemInfoDto(items, bookingService);
     }
 
     @GetMapping("/search")
     public List<ItemDto> searchBy(@RequestParam String text) {
-        return ItemDtoMapper.toItemDto(itemService.searchBy(text));
+        return ItemDtoMapper.toItemDtos(itemService.searchBy(text));
     }
 }

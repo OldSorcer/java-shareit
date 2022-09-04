@@ -110,6 +110,16 @@ public class BookingServiceImpl implements BookingService{
         return bookings;
     }
 
+    @Override
+    public Booking getLastBookingByItemId(Long itemId) {
+        return bookingRepository.findFirstByItem_IdAndEndBeforeOrderByEndDesc(itemId, LocalDateTime.now());
+    }
+
+    @Override
+    public Booking getNextBookingByItemId(Long itemId) {
+        return bookingRepository.findFirstByItem_IdAndStartAfterOrderByStartAsc(itemId, LocalDateTime.now());
+    }
+
     private void checkBooking(Booking booking) {
         LocalDateTime now = LocalDateTime.now();
         if (!booking.getItem().getAvailable()) {
