@@ -2,10 +2,13 @@ package ru.practicum.shareit.item.service;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.booking.BookingRepository;
+import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.exception.EntityNotFoundException;
 import ru.practicum.shareit.exception.InvalidArgumentException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemDtoMapper;
+import ru.practicum.shareit.item.dto.ItemInfoDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.storage.ItemDao;
 import ru.practicum.shareit.item.storage.ItemRepository;
@@ -13,6 +16,7 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.storage.UserDao;
 import ru.practicum.shareit.user.storage.UserRepository;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -21,6 +25,8 @@ import java.util.stream.Collectors;
 public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
+
+    private final BookingRepository bookingRepository;
 
     @Override
     public Item createItem(Item item, Long ownerId) {
@@ -50,7 +56,8 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public List<ItemDto> getItemByOwnerId(Long ownerId) {
         checkUser(ownerId);
-        return itemRepository.findByOwnerId(ownerId).stream().map(ItemDtoMapper::toItemDto).collect(Collectors.toList());
+        List<Item> items = itemRepository.findByOwnerId(ownerId);
+        return items.stream().map(ItemDtoMapper::toItemDto).collect(Collectors.toList());
     }
 
     @Override
