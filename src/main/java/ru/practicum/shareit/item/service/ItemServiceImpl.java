@@ -4,12 +4,14 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.exception.EntityCreateException;
 import ru.practicum.shareit.exception.EntityNotFoundException;
 import ru.practicum.shareit.exception.InvalidArgumentException;
 import ru.practicum.shareit.item.dto.ItemDtoMapper;
 import ru.practicum.shareit.item.dto.ItemInfoDto;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.item.storage.CommentRepository;
 import ru.practicum.shareit.item.storage.ItemRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.storage.UserRepository;
@@ -23,6 +25,7 @@ public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
+    private final CommentRepository commentRepository;
 
     @Override
     public Item createItem(Item item, Long ownerId) {
@@ -57,10 +60,12 @@ public class ItemServiceImpl implements ItemService {
         Booking lastBooking;
         Booking nextBooking;
         List<ItemInfoDto> itemInfoDtos = new ArrayList<>();
+        List<Comment> comments = new ArrayList<>();
         for (Item item : items) {
             lastBooking = bookingRepository.findFirstByItem_IdAndEndBeforeOrderByEndDesc(item.getId(), now);
             nextBooking = bookingRepository.findFirstByItem_IdAndStartAfterOrderByStartAsc(item.getId(), now);
-            itemInfoDtos.add(ItemDtoMapper.toItemInfoDto(item, lastBooking, nextBooking));
+            comments = commentRepository.findAllByItem_IdOrderById(item.getId());
+            itemInfoDtos.add(ItemDtoMapper.toItemInfoDto(item, lastBooking, nextBooking, comments));
         }
         return itemInfoDtos;
     }
@@ -76,7 +81,8 @@ public class ItemServiceImpl implements ItemService {
             lastBooking = bookingRepository.findFirstByItem_IdAndEndBeforeOrderByEndDesc(itemId, now);
             nextBooking = bookingRepository.findFirstByItem_IdAndStartAfterOrderByStartAsc(itemId, now);
         }
-        return ItemDtoMapper.toItemInfoDto(item, lastBooking, nextBooking);
+        List<Comment> comments = commentRepository.findAllByItem_IdOrderById(itemId);
+        return ItemDtoMapper.toItemInfoDto(item, lastBooking, nextBooking, comments);
     }
 
     @Override
@@ -89,7 +95,17 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public Comment createComment(Comment comment, Long userId, Long itemId) {
-        return null;
+        Item item = itemRepository.findById(itemId)
+                .orElseThrow(() -> new EntityNotFoundException(String.format("Вещи с ID %d не найдено", itemId)));
+        User user = checkUser(userId);
+        comment.setItem(item);
+        comment.setAuthor(user);
+        comment.setCreated(LocalDateTime.now());
+        Booking foundedBooking = bookingRepository.findFirstByItem_IdAndEndBeforeOrderByEndDesc(itemId, LocalDateTime.now());
+        if (Objects.isNull(foundedBooking)) {
+            throw new EntityCreateException("Оставить комментарий к незабронированной вещи невозможно");
+        }
+        return commentRepository.save(comment);
     }
 
     private User checkUser(Long userId) {

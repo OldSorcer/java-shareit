@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Builder
@@ -14,6 +15,7 @@ public class ItemInfoDto {
     private Boolean available;
     private Booking lastBooking;
     private Booking nextBooking;
+    private List<CommentDto> comments;
 
     @Data
     @Builder

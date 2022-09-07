@@ -1,10 +1,9 @@
 package ru.practicum.shareit.item.model;
 
 import lombok.*;
+import ru.practicum.shareit.requests.model.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.validator.groups.Create;
-import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.requests.model.ItemRequest;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;

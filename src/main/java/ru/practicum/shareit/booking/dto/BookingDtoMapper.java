@@ -29,7 +29,7 @@ public final class BookingDtoMapper {
                 .build();
     }
 
-    public static List<BookingDto> toBookingDto (List<Booking> bookings) {
+    public static List<BookingDto> toBookingDto(List<Booking> bookings) {
         return bookings.stream().map(BookingDtoMapper::toBookingDto).collect(Collectors.toList());
     }
 }

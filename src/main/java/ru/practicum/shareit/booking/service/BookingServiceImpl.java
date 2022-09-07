@@ -3,9 +3,9 @@ package ru.practicum.shareit.booking.service;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.BookingRepository;
+import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingState;
 import ru.practicum.shareit.booking.model.BookingStatus;
-import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.exception.EntityCreateException;
 import ru.practicum.shareit.exception.EntityNotFoundException;
 import ru.practicum.shareit.item.model.Item;
@@ -19,7 +19,7 @@ import java.util.List;
 
 @Service
 @AllArgsConstructor
-public class BookingServiceImpl implements BookingService{
+public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
@@ -38,8 +38,8 @@ public class BookingServiceImpl implements BookingService{
 
     @Override
     public Booking approveBooking(Long bookingId, Boolean approved, Long userId) {
-        Booking booking = bookingRepository.findById(bookingId).
-                orElseThrow(() -> new EntityNotFoundException(String.format("Бронирования с ID %d не существует",
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new EntityNotFoundException(String.format("Бронирования с ID %d не существует",
                         bookingId)));
         checkUser(userId);
         if (!booking.getItem().getOwner().getId().equals(userId)) {
@@ -90,6 +90,9 @@ public class BookingServiceImpl implements BookingService{
             case ALL:
                 bookings = bookingRepository.findAllByBooker_IdOrderByStartDesc(userId);
                 break;
+            case CURRENT:
+                bookings = bookingRepository.findByBooker_IdAndStartBeforeAndEndAfter(userId, now, now);
+                break;
         }
         return bookings;
     }
@@ -115,18 +118,11 @@ public class BookingServiceImpl implements BookingService{
             case ALL:
                 bookings = bookingRepository.findAllByItem_Owner_IdOrderByStartDesc(userId);
                 break;
+            case CURRENT:
+                bookings = bookingRepository.findAllByItem_Owner_IdAndStartBeforeAndEndAfter(userId, now, now);
+                break;
         }
         return bookings;
-    }
-
-    @Override
-    public Booking getLastBookingByItemId(Long itemId) {
-        return bookingRepository.findFirstByItem_IdAndEndBeforeOrderByEndDesc(itemId, LocalDateTime.now());
-    }
-
-    @Override
-    public Booking getNextBookingByItemId(Long itemId) {
-        return bookingRepository.findFirstByItem_IdAndStartAfterOrderByStartAsc(itemId, LocalDateTime.now());
     }
 
     private void checkBooking(Booking booking) {
