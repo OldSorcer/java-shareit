@@ -29,7 +29,7 @@ public class BookingServiceImpl implements BookingService {
         booking.setStatus(BookingStatus.WAITING);
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new EntityNotFoundException(String.format("Вещи с ID %d не существует", itemId)));
-        User user = checkUser(userId);
+        User user = findUser(userId);
         booking.setBooker(user);
         booking.setItem(item);
         checkBooking(booking);
@@ -38,10 +38,8 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public Booking approveBooking(Long bookingId, Boolean approved, Long userId) {
-        Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new EntityNotFoundException(String.format("Бронирования с ID %d не существует",
-                        bookingId)));
-        checkUser(userId);
+        Booking booking = findBooking(bookingId);
+        findUser(userId);
         if (!booking.getItem().getOwner().getId().equals(userId)) {
             throw new EntityNotFoundException("Вы не можете подтверждать или отклонять бронирование вещи," +
                     " владельцем которой не являетесь");
@@ -61,17 +59,15 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public Booking getBookingById(Long bookingId, Long userID) {
-        Booking foundedBooking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new EntityNotFoundException(String.format("Бронирования с ID %d не существует",
-                        bookingId)));
-        checkUser(userID);
+        Booking foundedBooking = findBooking(bookingId);
+        findUser(userID);
         checkBookingAccess(foundedBooking, userID);
         return foundedBooking;
     }
 
     @Override
     public List<Booking> getBookings(BookingState state, Long userId) {
-        checkUser(userId);
+        findUser(userId);
         List<Booking> bookings = new ArrayList<>();
         LocalDateTime now = LocalDateTime.now();
         switch (state) {
@@ -99,7 +95,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public List<Booking> getBookingsByOwnerId(BookingState state, Long userId) {
-        checkUser(userId);
+        findUser(userId);
         LocalDateTime now = LocalDateTime.now();
         List<Booking> bookings = new ArrayList<>();
         switch (state) {
@@ -152,8 +148,14 @@ public class BookingServiceImpl implements BookingService {
         }
     }
 
-    private User checkUser(Long id) {
+    private User findUser(Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(String.format("Пользователя с ID %d не существует", id)));
+    }
+
+    private Booking findBooking(Long bookingId) {
+        return bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new EntityNotFoundException(String.format("Бронирования с ID %d не существует",
+                        bookingId)));
     }
 }

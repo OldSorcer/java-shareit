@@ -17,7 +17,10 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.storage.UserRepository;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -60,7 +63,7 @@ public class ItemServiceImpl implements ItemService {
         Booking lastBooking;
         Booking nextBooking;
         List<ItemInfoDto> itemInfoDtos = new ArrayList<>();
-        List<Comment> comments = new ArrayList<>();
+        List<Comment> comments;
         for (Item item : items) {
             lastBooking = bookingRepository.findFirstByItem_IdAndEndBeforeOrderByEndDesc(item.getId(), now);
             nextBooking = bookingRepository.findFirstByItem_IdAndStartAfterOrderByStartAsc(item.getId(), now);
@@ -95,8 +98,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public Comment createComment(Comment comment, Long userId, Long itemId) {
-        Item item = itemRepository.findById(itemId)
-                .orElseThrow(() -> new EntityNotFoundException(String.format("Вещи с ID %d не найдено", itemId)));
+        Item item = findItem(itemId);
         User user = checkUser(userId);
         comment.setItem(item);
         comment.setAuthor(user);
@@ -122,7 +124,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private Item setItemStatement(Long itemId, Item item, Long ownerId) {
-        Item foundedItem = itemRepository.findById(itemId).orElseThrow(() -> new EntityNotFoundException("Вещи с таким ID не существует"));
+        Item foundedItem = findItem(itemId);
         if (!foundedItem.getOwner().getId().equals(ownerId)) {
             throw new EntityNotFoundException(String.format("Вещь с ID %d и ID владельца %d не найдена",
                     itemId, ownerId));
@@ -137,5 +139,10 @@ public class ItemServiceImpl implements ItemService {
             foundedItem.setAvailable(item.getAvailable());
         }
         return foundedItem;
+    }
+
+    private Item findItem(Long itemId) {
+        return itemRepository.findById(itemId)
+                .orElseThrow(() -> new EntityNotFoundException(String.format("Вещи с ID %d не найдено", itemId)));
     }
 }
