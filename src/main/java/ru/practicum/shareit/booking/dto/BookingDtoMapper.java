@@ -1,18 +1,14 @@
 package ru.practicum.shareit.booking.dto;
 
 import ru.practicum.shareit.booking.model.Booking;
-import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.user.model.User;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 public final class BookingDtoMapper {
-    public static Booking toBooking(BookingDto bookingDto, User booker, Item item) {
+    public static Booking toBooking(BookingDto bookingDto) {
         return Booking.builder().start(bookingDto.getStart())
                 .end(bookingDto.getEnd())
-                .item(item)
-                .booker(booker)
                 .build();
     }
 

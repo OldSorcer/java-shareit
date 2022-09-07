@@ -8,6 +8,9 @@ import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.exception.EntityCreateException;
 import ru.practicum.shareit.exception.EntityNotFoundException;
+import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.item.storage.ItemRepository;
+import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.storage.UserRepository;
 
 import java.time.LocalDateTime;
@@ -19,10 +22,16 @@ import java.util.List;
 public class BookingServiceImpl implements BookingService{
     private final BookingRepository bookingRepository;
     private final UserRepository userRepository;
+    private final ItemRepository itemRepository;
 
     @Override
-    public Booking createBooking(Booking booking) {
+    public Booking createBooking(Booking booking, Long userId, Long itemId) {
         booking.setStatus(BookingStatus.WAITING);
+        Item item = itemRepository.findById(itemId)
+                .orElseThrow(() -> new EntityNotFoundException(String.format("Вещи с ID %d не существует", itemId)));
+        User user = checkUser(userId);
+        booking.setBooker(user);
+        booking.setItem(item);
         checkBooking(booking);
         return bookingRepository.save(booking);
     }
@@ -147,8 +156,8 @@ public class BookingServiceImpl implements BookingService{
         }
     }
 
-    private void checkUser(Long id) {
-        userRepository.findById(id)
+    private User checkUser(Long id) {
+        return userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(String.format("Пользователя с ID %d не существует", id)));
     }
 }

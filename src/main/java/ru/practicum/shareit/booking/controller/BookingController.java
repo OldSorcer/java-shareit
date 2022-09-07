@@ -32,10 +32,8 @@ public class BookingController {
 
     @PostMapping
     public BookingDto createBooking(@RequestBody @Valid BookingDto bookingDto,
-                                    @RequestHeader(USER_ID_HEADER) Long userID) {
-        User foundedUser = userService.getUserById(userID);
-        Item foundedItem = itemService.getItemById(bookingDto.getItemId());
-        Booking createdBooking = bookingService.createBooking(BookingDtoMapper.toBooking(bookingDto, foundedUser, foundedItem));
+                                    @RequestHeader(USER_ID_HEADER) Long userId) {
+        Booking createdBooking = bookingService.createBooking(BookingDtoMapper.toBooking(bookingDto), userId, bookingDto.getItemId());
         return BookingDtoMapper.toBookingDto(createdBooking);
     }
 
