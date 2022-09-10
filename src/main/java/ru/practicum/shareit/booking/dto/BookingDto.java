@@ -9,9 +9,6 @@ import ru.practicum.shareit.booking.model.BookingStatus;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
-/**
- * // TODO .
- */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -24,18 +21,27 @@ public class BookingDto {
     private LocalDateTime end;
     @NotNull
     private Long itemId;
-    private Item item;
-    private User booker;
+    private BookingDto.Item item;
+    private BookingDto.User booker;
     private BookingStatus status;
 
     @Data
     public static class Item {
         private Long id;
         private String name;
+
+        public Item(ru.practicum.shareit.item.model.Item item) {
+            this.id = item.getId();
+            this.name = item.getName();
+        }
     }
 
     @Data
     public static class User {
         private Long id;
+
+        public User (ru.practicum.shareit.user.model.User user) {
+            this.id = user.getId();
+        }
     }
 }

@@ -3,6 +3,8 @@ package ru.practicum.shareit.booking.service;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.BookingRepository;
+import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.dto.BookingDtoMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingState;
 import ru.practicum.shareit.booking.model.BookingStatus;
@@ -25,7 +27,7 @@ public class BookingServiceImpl implements BookingService {
     private final ItemRepository itemRepository;
 
     @Override
-    public Booking createBooking(Booking booking, Long userId, Long itemId) {
+    public BookingDto createBooking(Booking booking, Long userId, Long itemId) {
         booking.setStatus(BookingStatus.WAITING);
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new EntityNotFoundException(String.format("Вещи с ID %d не существует", itemId)));
@@ -33,11 +35,11 @@ public class BookingServiceImpl implements BookingService {
         booking.setBooker(user);
         booking.setItem(item);
         checkBooking(booking);
-        return bookingRepository.save(booking);
+        return BookingDtoMapper.toBookingDto(bookingRepository.save(booking));
     }
 
     @Override
-    public Booking approveBooking(Long bookingId, Boolean approved, Long userId) {
+    public BookingDto approveBooking(Long bookingId, Boolean approved, Long userId) {
         Booking booking = findBooking(bookingId);
         findUser(userId);
         if (!booking.getItem().getOwner().getId().equals(userId)) {
@@ -54,71 +56,71 @@ public class BookingServiceImpl implements BookingService {
         } else {
             booking.setStatus(BookingStatus.REJECTED);
         }
-        return bookingRepository.save(booking);
+        return BookingDtoMapper.toBookingDto(bookingRepository.save(booking));
     }
 
     @Override
-    public Booking getBookingById(Long bookingId, Long userID) {
+    public BookingDto getBookingById(Long bookingId, Long userID) {
         Booking foundedBooking = findBooking(bookingId);
         findUser(userID);
         checkBookingAccess(foundedBooking, userID);
-        return foundedBooking;
+        return BookingDtoMapper.toBookingDto(foundedBooking);
     }
 
     @Override
-    public List<Booking> getBookings(BookingState state, Long userId) {
+    public List<BookingDto> getBookings(BookingState state, Long userId) {
         findUser(userId);
         List<Booking> bookings = new ArrayList<>();
         LocalDateTime now = LocalDateTime.now();
         switch (state) {
             case PAST:
-                bookings = bookingRepository.findAllByBooker_IdAndEndBeforeOrderByEndDesc(userId, now);
+                bookings = bookingRepository.findAllByBookerIdAndEndBeforeOrderByEndDesc(userId, now);
                 break;
             case FUTURE:
-                bookings = bookingRepository.findAllByBooker_IdAndStartAfterOrderByStartDesc(userId, now);
+                bookings = bookingRepository.findAllByBookerIdAndStartAfterOrderByStartDesc(userId, now);
                 break;
             case WAITING:
-                bookings = bookingRepository.findAllByBooker_IdAndStatusOrderByStartAsc(userId, BookingStatus.WAITING);
+                bookings = bookingRepository.findAllByBookerIdAndStatusOrderByStartAsc(userId, BookingStatus.WAITING);
                 break;
             case REJECTED:
-                bookings = bookingRepository.findAllByBooker_IdAndStatusOrderByStartAsc(userId, BookingStatus.REJECTED);
+                bookings = bookingRepository.findAllByBookerIdAndStatusOrderByStartAsc(userId, BookingStatus.REJECTED);
                 break;
             case ALL:
-                bookings = bookingRepository.findAllByBooker_IdOrderByStartDesc(userId);
+                bookings = bookingRepository.findAllByBookerIdOrderByStartDesc(userId);
                 break;
             case CURRENT:
-                bookings = bookingRepository.findByBooker_IdAndStartBeforeAndEndAfter(userId, now, now);
+                bookings = bookingRepository.findByBookerIdAndStartBeforeAndEndAfter(userId, now, now);
                 break;
         }
-        return bookings;
+        return BookingDtoMapper.toBookingDto(bookings);
     }
 
     @Override
-    public List<Booking> getBookingsByOwnerId(BookingState state, Long userId) {
+    public List<BookingDto> getBookingsByOwnerId(BookingState state, Long userId) {
         findUser(userId);
         LocalDateTime now = LocalDateTime.now();
         List<Booking> bookings = new ArrayList<>();
         switch (state) {
             case PAST:
-                bookings = bookingRepository.findAllByItem_Owner_IdAndEndBeforeOrderByEndDesc(userId, now);
+                bookings = bookingRepository.findAllByItemOwnerIdAndEndBeforeOrderByEndDesc(userId, now);
                 break;
             case FUTURE:
-                bookings = bookingRepository.findAllByItem_Owner_IdAndStartAfterOrderByStartDesc(userId, now);
+                bookings = bookingRepository.findAllByItemOwnerIdAndStartAfterOrderByStartDesc(userId, now);
                 break;
             case WAITING:
-                bookings = bookingRepository.findAllByItem_Owner_IdAndStatusOrderByStartAsc(userId, BookingStatus.WAITING);
+                bookings = bookingRepository.findAllByItemOwnerIdAndStatusOrderByStartAsc(userId, BookingStatus.WAITING);
                 break;
             case REJECTED:
-                bookings = bookingRepository.findAllByItem_Owner_IdAndStatusOrderByStartAsc(userId, BookingStatus.REJECTED);
+                bookings = bookingRepository.findAllByItemOwnerIdAndStatusOrderByStartAsc(userId, BookingStatus.REJECTED);
                 break;
             case ALL:
-                bookings = bookingRepository.findAllByItem_Owner_IdOrderByStartDesc(userId);
+                bookings = bookingRepository.findAllByItemOwnerIdOrderByStartDesc(userId);
                 break;
             case CURRENT:
-                bookings = bookingRepository.findAllByItem_Owner_IdAndStartBeforeAndEndAfter(userId, now, now);
+                bookings = bookingRepository.findAllByItemOwnerIdAndStartBeforeAndEndAfter(userId, now, now);
                 break;
         }
-        return bookings;
+        return BookingDtoMapper.toBookingDto(bookings);
     }
 
     private void checkBooking(Booking booking) {

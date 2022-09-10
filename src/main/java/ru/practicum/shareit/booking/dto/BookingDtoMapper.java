@@ -13,11 +13,8 @@ public final class BookingDtoMapper {
     }
 
     public static BookingDto toBookingDto(Booking booking) {
-        BookingDto.Item item = new BookingDto.Item();
-        item.setId(booking.getItem().getId());
-        item.setName(booking.getItem().getName());
-        BookingDto.User user = new BookingDto.User();
-        user.setId(booking.getBooker().getId());
+        BookingDto.Item item = new BookingDto.Item(booking.getItem());
+        BookingDto.User user = new BookingDto.User(booking.getBooker());
         return BookingDto.builder()
                 .id(booking.getId())
                 .start(booking.getStart())

@@ -8,29 +8,29 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface BookingRepository extends JpaRepository<Booking, Long> {
-    List<Booking> findAllByBooker_IdOrderByStartDesc(Long userId);
+    List<Booking> findAllByBookerIdOrderByStartDesc(Long userId);
 
-    List<Booking> findAllByBooker_IdAndEndBeforeOrderByEndDesc(Long userId, LocalDateTime now);
+    List<Booking> findAllByBookerIdAndEndBeforeOrderByEndDesc(Long userId, LocalDateTime now);
 
-    List<Booking> findAllByBooker_IdAndStartAfterOrderByStartDesc(Long userId, LocalDateTime now);
+    List<Booking> findAllByBookerIdAndStartAfterOrderByStartDesc(Long userId, LocalDateTime now);
 
-    List<Booking> findAllByBooker_IdAndStatusOrderByStartAsc(Long userId, BookingStatus status);
+    List<Booking> findAllByBookerIdAndStatusOrderByStartAsc(Long userId, BookingStatus status);
 
-    List<Booking> findAllByItem_Owner_IdOrderByStartDesc(Long userId);
+    List<Booking> findAllByItemOwnerIdOrderByStartDesc(Long userId);
 
-    List<Booking> findAllByItem_Owner_IdAndEndBeforeOrderByEndDesc(Long userId, LocalDateTime now);
+    List<Booking> findAllByItemOwnerIdAndEndBeforeOrderByEndDesc(Long userId, LocalDateTime now);
 
-    List<Booking> findAllByItem_Owner_IdAndStartAfterOrderByStartDesc(Long userId, LocalDateTime now);
+    List<Booking> findAllByItemOwnerIdAndStartAfterOrderByStartDesc(Long userId, LocalDateTime now);
 
-    List<Booking> findAllByItem_Owner_IdAndStatusOrderByStartAsc(Long userId, BookingStatus status);
+    List<Booking> findAllByItemOwnerIdAndStatusOrderByStartAsc(Long userId, BookingStatus status);
 
-    Booking findFirstByItem_IdAndEndBeforeOrderByEndDesc(Long itemId, LocalDateTime now);
+    Booking findFirstByItemIdAndEndBeforeOrderByEndDesc(Long itemId, LocalDateTime now);
 
-    Booking findFirstByItem_IdAndStartAfterOrderByStartAsc(Long itemId, LocalDateTime now);
+    Booking findFirstByItemIdAndStartAfterOrderByStartAsc(Long itemId, LocalDateTime now);
 
-    List<Booking> findByBooker_IdAndStartBeforeAndEndAfter(Long itemId, LocalDateTime start, LocalDateTime end);
+    List<Booking> findByBookerIdAndStartBeforeAndEndAfter(Long itemId, LocalDateTime start, LocalDateTime end);
 
-    List<Booking> findAllByItem_Owner_IdAndStartBeforeAndEndAfter(Long itemOwnerId,
-                                                                  LocalDateTime start,
-                                                                  LocalDateTime end);
+    List<Booking> findAllByItemOwnerIdAndStartBeforeAndEndAfter(Long itemOwnerId,
+                                                                LocalDateTime start,
+                                                                LocalDateTime end);
 }

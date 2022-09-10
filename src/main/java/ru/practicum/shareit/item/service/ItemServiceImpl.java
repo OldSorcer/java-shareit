@@ -65,9 +65,9 @@ public class ItemServiceImpl implements ItemService {
         List<ItemInfoDto> itemInfoDtos = new ArrayList<>();
         List<Comment> comments;
         for (Item item : items) {
-            lastBooking = bookingRepository.findFirstByItem_IdAndEndBeforeOrderByEndDesc(item.getId(), now);
-            nextBooking = bookingRepository.findFirstByItem_IdAndStartAfterOrderByStartAsc(item.getId(), now);
-            comments = commentRepository.findAllByItem_IdOrderById(item.getId());
+            lastBooking = bookingRepository.findFirstByItemIdAndEndBeforeOrderByEndDesc(item.getId(), now);
+            nextBooking = bookingRepository.findFirstByItemIdAndStartAfterOrderByStartAsc(item.getId(), now);
+            comments = commentRepository.findAllByItemIdOrderById(item.getId());
             itemInfoDtos.add(ItemDtoMapper.toItemInfoDto(item, lastBooking, nextBooking, comments));
         }
         return itemInfoDtos;
@@ -81,10 +81,10 @@ public class ItemServiceImpl implements ItemService {
         Booking lastBooking = null;
         Booking nextBooking = null;
         if (item.getOwner().getId().equals(userId)) {
-            lastBooking = bookingRepository.findFirstByItem_IdAndEndBeforeOrderByEndDesc(itemId, now);
-            nextBooking = bookingRepository.findFirstByItem_IdAndStartAfterOrderByStartAsc(itemId, now);
+            lastBooking = bookingRepository.findFirstByItemIdAndEndBeforeOrderByEndDesc(itemId, now);
+            nextBooking = bookingRepository.findFirstByItemIdAndStartAfterOrderByStartAsc(itemId, now);
         }
-        List<Comment> comments = commentRepository.findAllByItem_IdOrderById(itemId);
+        List<Comment> comments = commentRepository.findAllByItemIdOrderById(itemId);
         return ItemDtoMapper.toItemInfoDto(item, lastBooking, nextBooking, comments);
     }
 
@@ -103,7 +103,7 @@ public class ItemServiceImpl implements ItemService {
         comment.setItem(item);
         comment.setAuthor(user);
         comment.setCreated(LocalDateTime.now());
-        Booking foundedBooking = bookingRepository.findFirstByItem_IdAndEndBeforeOrderByEndDesc(itemId, LocalDateTime.now());
+        Booking foundedBooking = bookingRepository.findFirstByItemIdAndEndBeforeOrderByEndDesc(itemId, LocalDateTime.now());
         if (Objects.isNull(foundedBooking)) {
             throw new EntityCreateException("Оставить комментарий к незабронированной вещи невозможно");
         }
