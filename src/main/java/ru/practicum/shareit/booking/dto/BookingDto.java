@@ -40,7 +40,7 @@ public class BookingDto {
     public static class User {
         private Long id;
 
-        public User (ru.practicum.shareit.user.model.User user) {
+        public User(ru.practicum.shareit.user.model.User user) {
             this.id = user.getId();
         }
     }
