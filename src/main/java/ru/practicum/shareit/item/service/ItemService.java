@@ -15,11 +15,11 @@ public interface ItemService {
 
     List<Item> getAllItems();
 
-    List<ItemInfoDto> getItemByOwnerId(Long ownerId);
+    List<ItemInfoDto> getItemByOwnerId(Long ownerId, int from, int size);
 
     ItemInfoDto getItemById(Long itemId, Long userId);
 
-    List<Item> searchBy(String word);
+    List<Item> searchBy(String word, int from, int size);
 
     Comment createComment(Comment comment, Long userId, Long itemId);
 }

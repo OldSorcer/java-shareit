@@ -1,6 +1,8 @@
 package ru.practicum.shareit.item.service;
 
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.booking.model.Booking;
@@ -63,9 +65,10 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemInfoDto> getItemByOwnerId(Long ownerId) {
+    public List<ItemInfoDto> getItemByOwnerId(Long ownerId, int from, int size) {
         checkUser(ownerId);
-        List<Item> items = itemRepository.findByOwnerIdOrderById(ownerId);
+        Pageable page = PageRequest.of(from / size, size);
+        List<Item> items = itemRepository.findByOwnerIdOrderById(ownerId, page);
         LocalDateTime now = LocalDateTime.now();
         Booking lastBooking;
         Booking nextBooking;
@@ -96,11 +99,12 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<Item> searchBy(String word) {
+    public List<Item> searchBy(String word, int from, int size) {
         if (word.isEmpty() || word.isBlank()) {
             return new ArrayList<>();
         }
-        return itemRepository.searchBy(word);
+        Pageable page = PageRequest.of(from / size, size);
+        return itemRepository.searchBy(word, page);
     }
 
     @Override
