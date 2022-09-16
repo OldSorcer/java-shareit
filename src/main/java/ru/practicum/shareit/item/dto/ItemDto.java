@@ -28,6 +28,6 @@ public class ItemDto {
     private String description;
     @NotNull(groups = {Create.class})
     private Boolean available;
-    private User owner;
-    private ItemRequest request;
+    private Long ownerId;
+    private Long requestId;
 }

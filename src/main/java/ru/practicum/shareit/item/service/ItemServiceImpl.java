@@ -13,6 +13,7 @@ import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.storage.CommentRepository;
 import ru.practicum.shareit.item.storage.ItemRepository;
+import ru.practicum.shareit.requests.storage.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.storage.UserRepository;
 
@@ -29,11 +30,17 @@ public class ItemServiceImpl implements ItemService {
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
+    private final ItemRequestRepository itemRequestRepository;
 
     @Override
     public Item createItem(Item item, Long ownerId) {
         User foundedUser = checkUser(ownerId);
         item.setOwner(foundedUser);
+        if (Objects.nonNull(item.getRequest())) {
+            item.setRequest(itemRequestRepository.findById(item.getRequest().getId())
+                    .orElseThrow(() -> new EntityNotFoundException(String.format("Запроса с ID %d не существует",
+                            item.getRequest().getId()))));
+        }
         return itemRepository.save(item);
     }
 

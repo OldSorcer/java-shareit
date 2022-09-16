@@ -3,6 +3,7 @@ package ru.practicum.shareit.item.dto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.requests.model.ItemRequest;
 
 import java.util.List;
 import java.util.Objects;
@@ -10,24 +11,32 @@ import java.util.stream.Collectors;
 
 public final class ItemDtoMapper {
     public static ItemDto toItemDto(Item item) {
+        Long requestId = null;
+        if (Objects.nonNull(item.getRequest())) {
+            requestId = item.getRequest().getId();
+        }
         return ItemDto.builder()
                 .id(item.getId())
                 .name(item.getName())
                 .description(item.getDescription())
-                .owner(item.getOwner())
+                .ownerId(item.getOwner().getId())
                 .available(item.getAvailable())
-                .request(item.getRequest())
+                .requestId(requestId)
                 .build();
     }
 
     public static Item toItem(ItemDto itemDto) {
+        ItemRequest itemRequest = null;
+        if (Objects.nonNull(itemDto.getRequestId())) {
+            itemRequest = new ItemRequest();
+            itemRequest.setId(itemDto.getRequestId());
+        }
         return Item.builder()
                 .id(itemDto.getId())
                 .name(itemDto.getName())
                 .description(itemDto.getDescription())
-                .owner(itemDto.getOwner())
+                .request(itemRequest)
                 .available(itemDto.getAvailable())
-                .request(itemDto.getRequest())
                 .build();
     }
 
@@ -38,6 +47,7 @@ public final class ItemDtoMapper {
     public static ItemInfoDto toItemInfoDto(Item item, Booking lastBooking, Booking nextBooking, List<Comment> comments) {
         ItemInfoDto.Booking lastBookingDto = null;
         ItemInfoDto.Booking nextBookingDto = null;
+        Long requestId = null;
         if (Objects.nonNull((lastBooking))) {
             lastBookingDto = ItemInfoDto.Booking.builder().id(lastBooking.getId())
                     .start(lastBooking.getStart())
@@ -52,6 +62,9 @@ public final class ItemDtoMapper {
                     .bookerId(nextBooking.getBooker().getId())
                     .build();
         }
+        if (Objects.nonNull(item.getRequest())) {
+            requestId = item.getRequest().getId();
+        }
         return ItemInfoDto.builder().id(item.getId())
                 .name(item.getName())
                 .description(item.getDescription())
@@ -59,6 +72,7 @@ public final class ItemDtoMapper {
                 .lastBooking(lastBookingDto)
                 .nextBooking(nextBookingDto)
                 .comments(CommentDtoMapper.toCommentDto(comments))
+                .requestId(requestId)
                 .build();
     }
 }
