@@ -108,7 +108,7 @@ class BookingRepositoryTest {
     void afterEach() {
         bookingRepository.deleteAll();
         itemRepository.deleteAll();
-        itemRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
     @Test
