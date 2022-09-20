@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.test.annotation.DirtiesContext;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.storage.UserRepository;
@@ -17,14 +16,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @DataJpaTest
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class ItemRepositoryTest {
-    private final User user = new User(1L, "User", "user@email.ru");
-    private final Item item = Item.builder().id(1L)
-            .name("Item")
-            .description("Description")
-            .available(true)
-            .owner(user).build();
+    private User user = new User(null, "User", "user@email.ru");
+    private Item item;
     @Autowired
     private ItemRepository itemRepository;
     @Autowired
@@ -32,7 +26,12 @@ class ItemRepositoryTest {
 
     @BeforeEach
     void beforeEach() {
-        userRepository.save(user);
+        user = userRepository.save(user);
+        item = Item.builder()
+                .name("Item")
+                .description("Description")
+                .available(true)
+                .owner(user).build();
         itemRepository.save(item);
     }
 

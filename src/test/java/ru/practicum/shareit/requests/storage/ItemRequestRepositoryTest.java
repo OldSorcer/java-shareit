@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.test.annotation.DirtiesContext;
 import ru.practicum.shareit.requests.model.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.storage.UserRepository;
@@ -18,13 +17,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @DataJpaTest
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class ItemRequestRepositoryTest {
 
-    private final User user1 = new User(1L, "User1", "user1@email.ru");
-    private final User user2 = new User(2L, "User2", "user2@email.ru");
-    private final ItemRequest itemRequest1 = new ItemRequest(1L, "Description", user1, LocalDateTime.now());
-    private final ItemRequest itemRequest2 = new ItemRequest(2L, "Description", user2, LocalDateTime.now());
+    private User user1 = new User(null, "User1", "user1@email.ru");
+    private User user2 = new User(null, "User2", "user2@email.ru");
+    private ItemRequest itemRequest1;
+    private ItemRequest itemRequest2;
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -32,10 +30,12 @@ class ItemRequestRepositoryTest {
 
     @BeforeEach
     void beforeEach() {
-        userRepository.save(user1);
-        userRepository.save(user2);
-        itemRequestRepository.save(itemRequest1);
-        itemRequestRepository.save(itemRequest2);
+        user1 = userRepository.save(user1);
+        user2 = userRepository.save(user2);
+        itemRequest1 = new ItemRequest(null, "Description", user1, LocalDateTime.now());
+        itemRequest2 = new ItemRequest(null, "Description", user2, LocalDateTime.now());
+        itemRequest1 = itemRequestRepository.save(itemRequest1);
+        itemRequest2 = itemRequestRepository.save(itemRequest2);
     }
 
     @AfterEach
@@ -46,7 +46,7 @@ class ItemRequestRepositoryTest {
 
     @Test
     void shouldFindRequestByRequesterId() {
-        List<ItemRequest> result = itemRequestRepository.findAllByRequesterIdOrderById(1L);
+        List<ItemRequest> result = itemRequestRepository.findAllByRequesterIdOrderById(user1.getId());
         assertEquals(1, result.size());
         assertFalse(result.isEmpty());
         assertEquals(user1.getName(), result.get(0).getRequester().getName());
@@ -54,7 +54,7 @@ class ItemRequestRepositoryTest {
 
     @Test
     void shouldFindRequestsWithoutRequestsWithUserId() {
-        List<ItemRequest> result = itemRequestRepository.findByRequesterIdNot(1L, Pageable.unpaged());
+        List<ItemRequest> result = itemRequestRepository.findByRequesterIdNot(user1.getId(), Pageable.unpaged());
         assertEquals(1, result.size());
         assertFalse(result.isEmpty());
         assertEquals(user2.getName(), result.get(0).getRequester().getName());

@@ -5,7 +5,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.test.annotation.DirtiesContext;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 
@@ -16,10 +15,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @DataJpaTest
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class CommentRepositoryTest {
-    private final Item item = Item.builder().id(1L).name("Item").description("Description").available(true).build();
-    private final Comment comment = new Comment(1L, "Comment", null, item, LocalDateTime.now());
+    private Item item = Item.builder().name("Item").description("Description").available(true).build();
+    private Comment comment;
     @Autowired
     private ItemRepository itemRepository;
     @Autowired
@@ -27,8 +25,9 @@ class CommentRepositoryTest {
 
     @BeforeEach
     void beforeEach() {
-        itemRepository.save(item);
-        commentRepository.save(comment);
+        item = itemRepository.save(item);
+        comment = new Comment(null, "Comment", null, item, LocalDateTime.now());
+        comment = commentRepository.save(comment);
     }
 
     @AfterEach
@@ -39,7 +38,7 @@ class CommentRepositoryTest {
 
     @Test
     void shouldFindCommentByItemId() {
-        List<Comment> result = commentRepository.findAllByItemIdOrderById(1L);
+        List<Comment> result = commentRepository.findAllByItemIdOrderById(item.getId());
         assertEquals(1, result.size());
         assertFalse(result.isEmpty());
         assertEquals(comment.getId(), result.get(0).getId());

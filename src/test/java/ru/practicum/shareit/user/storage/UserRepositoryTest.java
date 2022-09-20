@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @DataJpaTest
 class UserRepositoryTest {
 
-    private final User user = new User(1L, "User", "user@email.ru");
+    private final User user = new User(null, "User", "user@email.ru");
     @Autowired
     private UserRepository userRepository;
 
