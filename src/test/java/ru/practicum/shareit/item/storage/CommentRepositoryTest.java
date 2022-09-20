@@ -4,7 +4,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.annotation.DirtiesContext;
 import ru.practicum.shareit.item.model.Comment;
@@ -19,14 +18,12 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 @DataJpaTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class CommentRepositoryTest {
-    @Autowired
-    private ItemRepository itemRepository;
-
-    @Autowired
-    private CommentRepository commentRepository;
     private final Item item = Item.builder().id(1L).name("Item").description("Description").available(true).build();
     private final Comment comment = new Comment(1L, "Comment", null, item, LocalDateTime.now());
-
+    @Autowired
+    private ItemRepository itemRepository;
+    @Autowired
+    private CommentRepository commentRepository;
 
     @BeforeEach
     void beforeEach() {
