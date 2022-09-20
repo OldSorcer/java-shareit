@@ -3,7 +3,6 @@ package ru.practicum.shareit.item.controller;
 import lombok.AllArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
@@ -24,7 +23,6 @@ import java.util.List;
 public class ItemController {
     private static final String USER_ID_HEADER = "X-Sharer-User-Id";
     private final ItemService itemService;
-    private final BookingService bookingService;
 
     @PostMapping
     public ItemDto createItem(@RequestBody @Validated({Create.class}) ItemDto itemDto,

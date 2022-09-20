@@ -29,7 +29,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     Booking findFirstByItemIdAndStartAfterOrderByStartAsc(Long itemId, LocalDateTime now);
 
-    List<Booking> findByBookerIdAndStartBeforeAndEndAfter(Long itemId, LocalDateTime start, LocalDateTime end, Pageable page);
+    List<Booking> findByBookerIdAndStartBeforeAndEndAfter(Long bookerId, LocalDateTime start, LocalDateTime end, Pageable page);
 
     List<Booking> findAllByItemOwnerIdAndStartBeforeAndEndAfter(Long itemOwnerId,
                                                                 LocalDateTime start,

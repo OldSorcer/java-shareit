@@ -19,6 +19,7 @@ import javax.validation.constraints.NotNull;
 @Getter
 @Entity
 @Table(name = "items")
+@ToString
 public class Item {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
