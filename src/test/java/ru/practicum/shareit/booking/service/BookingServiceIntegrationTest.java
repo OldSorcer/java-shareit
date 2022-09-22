@@ -1,6 +1,7 @@
 package ru.practicum.shareit.booking.service;
 
 import lombok.RequiredArgsConstructor;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,11 +15,10 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 
 import javax.transaction.Transactional;
-
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Transactional
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
@@ -33,59 +33,48 @@ class BookingServiceIntegrationTest {
     private User user = new User(null, "User", "user@email.com");
     private User booker = new User(null, "Booker", "booker@emaul.com");
     private Item item = new Item(null, "Item", "Description", true, null, null);
-    private Booking booking = new Booking(null, LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(2), null, null, null);
+    private final Booking booking = new Booking(null, LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(2), null, null, null);
+    private BookingDto createdBooking;
+
+    @BeforeEach
+    void beforeEach() {
+        user = userService.createUser(user);
+        booker = userService.createUser(booker);
+        item = itemService.createItem(item, user.getId());
+        createdBooking = bookingService.createBooking(booking, booker.getId(), item.getId());
+    }
 
     @Test
     void approveBooking() {
-        User createdUser = userService.createUser(user);
-        User createdBooker = userService.createUser(booker);
-        Item createdItem = itemService.createItem(item, createdUser.getId());
-        BookingDto createdBooking = bookingService.createBooking(booking, createdBooker.getId(), createdItem.getId());
         BookingDto approvedBooking = bookingService.approveBooking(createdBooking.getId(), true, user.getId());
         assertEquals(BookingStatus.APPROVED, approvedBooking.getStatus());
     }
 
     @Test
     void getBookings() {
-        User createdUser = userService.createUser(user);
-        User createdBooker = userService.createUser(booker);
-        Item createdItem = itemService.createItem(item, createdUser.getId());
-        BookingDto createdBooking = bookingService.createBooking(booking, createdBooker.getId(), createdItem.getId());
-        List<BookingDto> result = bookingService.getBookings(BookingState.ALL, createdBooker.getId(), 1, 10);
+        List<BookingDto> result = bookingService.getBookings(BookingState.ALL, booker.getId(), 1, 10);
         assertEquals(1, result.size());
         assertEquals(createdBooking.getId(), result.get(0).getId());
     }
 
     @Test
     void getBookingsByOwnerId() {
-        User createdUser = userService.createUser(user);
-        User createdBooker = userService.createUser(booker);
-        Item createdItem = itemService.createItem(item, createdUser.getId());
-        BookingDto createdBooking = bookingService.createBooking(booking, createdBooker.getId(), createdItem.getId());
-        List<BookingDto> result = bookingService.getBookingsByOwnerId(BookingState.ALL, createdUser.getId(), 1, 10);
+        List<BookingDto> result = bookingService.getBookingsByOwnerId(BookingState.ALL, user.getId(), 1, 10);
         assertEquals(1, result.size());
         assertEquals(createdBooking.getId(), result.get(0).getId());
     }
 
     @Test
     void getFutureBookings() {
-        User createdUser = userService.createUser(user);
-        User createdBooker = userService.createUser(booker);
-        Item createdItem = itemService.createItem(item, createdUser.getId());
-        BookingDto createdBooking = bookingService.createBooking(booking, createdBooker.getId(), createdItem.getId());
-        List<BookingDto> result = bookingService.getBookings(BookingState.FUTURE, createdBooker.getId(), 1, 10);
+        List<BookingDto> result = bookingService.getBookings(BookingState.FUTURE, booker.getId(), 1, 10);
         assertEquals(1, result.size());
         assertEquals(createdBooking.getId(), result.get(0).getId());
     }
 
     @Test
     void getRejectedBookings() {
-        User createdUser = userService.createUser(user);
-        User createdBooker = userService.createUser(booker);
-        Item createdItem = itemService.createItem(item, createdUser.getId());
-        BookingDto createdBooking = bookingService.createBooking(booking, createdBooker.getId(), createdItem.getId());
-        BookingDto rejectedBooking = bookingService.approveBooking(createdBooking.getId(), false, createdUser.getId());
-        List<BookingDto> result = bookingService.getBookings(BookingState.REJECTED, createdBooker.getId(), 1, 10);
+        BookingDto rejectedBooking = bookingService.approveBooking(createdBooking.getId(), false, user.getId());
+        List<BookingDto> result = bookingService.getBookings(BookingState.REJECTED, booker.getId(), 1, 10);
         assertEquals(1, result.size());
         assertEquals(createdBooking.getId(), result.get(0).getId());
         assertEquals(rejectedBooking.getStatus(), result.get(0).getStatus());
@@ -93,11 +82,7 @@ class BookingServiceIntegrationTest {
 
     @Test
     void getWaitingBooking() {
-        User createdUser = userService.createUser(user);
-        User createdBooker = userService.createUser(booker);
-        Item createdItem = itemService.createItem(item, createdUser.getId());
-        BookingDto createdBooking = bookingService.createBooking(booking, createdBooker.getId(), createdItem.getId());
-        List<BookingDto> result = bookingService.getBookings(BookingState.WAITING, createdBooker.getId(), 1, 10);
+        List<BookingDto> result = bookingService.getBookings(BookingState.WAITING, booker.getId(), 1, 10);
         assertEquals(1, result.size());
         assertEquals(createdBooking.getId(), result.get(0).getId());
         assertEquals(createdBooking.getStatus(), result.get(0).getStatus());
@@ -105,12 +90,8 @@ class BookingServiceIntegrationTest {
 
     @Test
     void getRejectedBookingsByOwnerId() {
-        User createdUser = userService.createUser(user);
-        User createdBooker = userService.createUser(booker);
-        Item createdItem = itemService.createItem(item, createdUser.getId());
-        BookingDto createdBooking = bookingService.createBooking(booking, createdBooker.getId(), createdItem.getId());
-        BookingDto rejectedBooking = bookingService.approveBooking(createdBooking.getId(), false, createdUser.getId());
-        List<BookingDto> result = bookingService.getBookingsByOwnerId(BookingState.REJECTED, createdUser.getId(), 1, 10);
+        BookingDto rejectedBooking = bookingService.approveBooking(createdBooking.getId(), false, user.getId());
+        List<BookingDto> result = bookingService.getBookingsByOwnerId(BookingState.REJECTED, user.getId(), 1, 10);
         assertEquals(1, result.size());
         assertEquals(rejectedBooking.getId(), result.get(0).getId());
         assertEquals(rejectedBooking.getStatus(), result.get(0).getStatus());
@@ -118,22 +99,14 @@ class BookingServiceIntegrationTest {
 
     @Test
     void getFutureBookingsByOwnerId() {
-        User createdUser = userService.createUser(user);
-        User createdBooker = userService.createUser(booker);
-        Item createdItem = itemService.createItem(item, createdUser.getId());
-        BookingDto createdBooking = bookingService.createBooking(booking, createdBooker.getId(), createdItem.getId());
-        List<BookingDto> result = bookingService.getBookingsByOwnerId(BookingState.FUTURE, createdUser.getId(), 1, 10);
+        List<BookingDto> result = bookingService.getBookingsByOwnerId(BookingState.FUTURE, user.getId(), 1, 10);
         assertEquals(1, result.size());
         assertEquals(createdBooking.getId(), result.get(0).getId());
     }
 
     @Test
     void getWaitingBookingsByOwnerId() {
-        User createdUser = userService.createUser(user);
-        User createdBooker = userService.createUser(booker);
-        Item createdItem = itemService.createItem(item, createdUser.getId());
-        BookingDto createdBooking = bookingService.createBooking(booking, createdBooker.getId(), createdItem.getId());
-        List<BookingDto> result = bookingService.getBookingsByOwnerId(BookingState.WAITING, createdUser.getId(), 1, 10);
+        List<BookingDto> result = bookingService.getBookingsByOwnerId(BookingState.WAITING, user.getId(), 1, 10);
         assertEquals(1, result.size());
         assertEquals(createdBooking.getId(), result.get(0).getId());
         assertEquals(createdBooking.getStatus(), result.get(0).getStatus());

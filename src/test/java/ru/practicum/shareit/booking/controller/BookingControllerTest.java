@@ -27,27 +27,28 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(controllers = BookingController.class)
 class BookingControllerTest {
+    private final static String HEADER = "X-Sharer-User-Id";
+    private final User user = new User(1L, "User", "user@email.ru");
+    private final Item item = new Item(1L, "Item", "Description", true, user, null);
+    private final Booking booking = new Booking(1L, LocalDateTime.now().withNano(0), LocalDateTime.now().withNano(0), item, user, BookingStatus.WAITING);
+    private final BookingDto bookingDto = BookingDtoMapper.toBookingDto(booking);
+    private final BookingDto bookingEntryDto = new BookingDto();
     @Autowired
-    ObjectMapper mapper;
+    private ObjectMapper mapper;
     @MockBean
-    BookingService bookingService;
+    private BookingService bookingService;
     @Autowired
-    MockMvc mvc;
-    User user = new User(1L, "User", "user@email.ru");
-    Item item = new Item(1L, "Item", "Description", true, user, null);
-    Booking booking = new Booking(1L, LocalDateTime.now().withNano(0), LocalDateTime.now().withNano(0), item, user, BookingStatus.WAITING);
-    BookingDto bookingDto = BookingDtoMapper.toBookingDto(booking);
-    BookingDto bookingEntryDto = new BookingDto();
+    private MockMvc mvc;
 
     @Test
-    void createBooking() throws Exception {
+    void shouldReturn200WhenBookingIsCreated() throws Exception {
         bookingEntryDto.setStart(LocalDateTime.now().withNano(0));
         bookingEntryDto.setEnd(LocalDateTime.MAX.withNano(0));
         bookingEntryDto.setItemId(item.getId());
         when(bookingService.createBooking(any(), anyLong(), anyLong()))
                 .thenReturn(bookingEntryDto);
         mvc.perform(post("/bookings")
-                        .header("X-Sharer-User-Id", 1)
+                        .header(HEADER, 1)
                         .content(mapper.writeValueAsString(bookingEntryDto))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -58,13 +59,13 @@ class BookingControllerTest {
     }
 
     @Test
-    void approveBooking() throws Exception {
+    void shouldReturn200IfBookingStatusIsApproved() throws Exception {
         when(bookingService.approveBooking(anyLong(), any(), anyLong()))
                 .thenReturn(bookingDto);
 
         mvc.perform(patch("/bookings/1?approved=true")
                         .accept(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", 1))
+                        .header(HEADER, 1))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(bookingDto.getId()), Long.class))
                 .andExpect(jsonPath("$.start", is(String.format("%s", bookingDto.getStart()))))
@@ -74,13 +75,13 @@ class BookingControllerTest {
     }
 
     @Test
-    void getBookingById() throws Exception {
+    void shouldReturn200OnGetBookingByIdWhenIdIsValid() throws Exception {
         when(bookingService.getBookingById(anyLong(), anyLong()))
                 .thenReturn(bookingDto);
 
         mvc.perform(get("/bookings/1")
                         .accept(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", 1))
+                        .header(HEADER, 1))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(bookingDto.getId()), Long.class))
                 .andExpect(jsonPath("$.start", is(String.format("%s", bookingDto.getStart()))))
@@ -89,13 +90,13 @@ class BookingControllerTest {
     }
 
     @Test
-    void getBookings() throws Exception {
+    void shouldReturn200WhenBookingGetAll() throws Exception {
         when(bookingService.getBookings(any(), anyLong(), anyInt(), anyInt()))
                 .thenReturn(List.of(bookingDto));
 
         mvc.perform(get("/bookings")
                         .accept(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", 1))
+                        .header(HEADER, 1))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id", is(bookingDto.getId()), Long.class))
                 .andExpect(jsonPath("$[0].start", is(String.format("%s", bookingDto.getStart()))))
@@ -104,13 +105,13 @@ class BookingControllerTest {
     }
 
     @Test
-    void getBookingsByOwnerId() throws Exception {
+    void shouldReturn200WhenBookingGetByOwnerId() throws Exception {
         when(bookingService.getBookingsByOwnerId(any(), anyLong(), anyInt(), anyInt()))
                 .thenReturn(List.of(bookingDto));
 
         mvc.perform(get("/bookings/owner")
                         .accept(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", 1))
+                        .header(HEADER, 1))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id", is(bookingDto.getId()), Long.class))
                 .andExpect(jsonPath("$[0].start", is(String.format("%s", bookingDto.getStart()))))

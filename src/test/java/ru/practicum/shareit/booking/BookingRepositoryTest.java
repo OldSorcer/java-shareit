@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DataJpaTest
 class BookingRepositoryTest {
+    private final LocalDateTime now = LocalDateTime.now();
     private User user1 = new User(null, "User1", "user1@email.ru");
     private User user2 = new User(null, "User2", "user2@email.ru");
     private User user3 = new User(null, "User3", "user3@email.ru");
@@ -28,11 +29,8 @@ class BookingRepositoryTest {
     private Booking booking1;
     private Booking booking2;
     private Booking booking3;
-
     private Booking booking4;
-
     private Booking booking5;
-
     private Booking booking6;
     @Autowired
     private BookingRepository bookingRepository;
@@ -62,48 +60,48 @@ class BookingRepositoryTest {
         item2 = itemRepository.save(item2);
         booking1 = Booking.builder()
                 .item(item)
-                .start(LocalDateTime.now().plusDays(4L))
-                .end(LocalDateTime.now().plusDays(8L))
+                .start(now.plusDays(4L))
+                .end(now.plusDays(8L))
                 .booker(user1)
                 .item(item)
                 .status(BookingStatus.WAITING)
                 .build();
         booking2 = Booking.builder()
                 .item(item)
-                .start(LocalDateTime.now().plusDays(8L))
-                .end(LocalDateTime.now().plusDays(12L))
+                .start(now.plusDays(8L))
+                .end(now.plusDays(12L))
                 .booker(user2)
                 .item(item)
                 .status(BookingStatus.APPROVED)
                 .build();
         booking3 = Booking.builder()
                 .item(item)
-                .start(LocalDateTime.now().plusDays(4L))
-                .end(LocalDateTime.now().plusDays(8L))
+                .start(now.plusDays(4L))
+                .end(now.plusDays(8L))
                 .booker(user3)
                 .item(item2)
                 .status(BookingStatus.REJECTED)
                 .build();
         booking4 = Booking.builder()
                 .item(item)
-                .start(LocalDateTime.now().plusDays(8L))
-                .end(LocalDateTime.now().plusDays(12L))
+                .start(now.plusDays(8L))
+                .end(now.plusDays(12L))
                 .booker(user1)
                 .item(item2)
                 .status(BookingStatus.REJECTED)
                 .build();
         booking5 = Booking.builder()
                 .item(item)
-                .start(LocalDateTime.now().plusDays(2L))
-                .end(LocalDateTime.now().plusDays(4L))
+                .start(now.plusDays(2L))
+                .end(now.plusDays(4L))
                 .booker(user2)
                 .item(item2)
                 .status(BookingStatus.WAITING)
                 .build();
         booking6 = Booking.builder()
                 .item(item)
-                .start(LocalDateTime.now().plusDays(6L))
-                .end(LocalDateTime.now().plusDays(8L))
+                .start(now.plusDays(6L))
+                .end(now.plusDays(8L))
                 .booker(user3)
                 .item(item2)
                 .status(BookingStatus.APPROVED)
@@ -125,7 +123,8 @@ class BookingRepositoryTest {
 
     @Test
     void shouldReturnFoundedBookingByBookerId() {
-        List<Booking> result = bookingRepository.findAllByBookerIdOrderByStartDesc(user2.getId(), Pageable.unpaged());
+        List<Booking> result = bookingRepository.findAllByBookerIdOrderByStartDesc(user2.getId(),
+                Pageable.unpaged());
         assertEquals(2, result.size());
         assertEquals(booking2.getId(), result.get(0).getId());
         assertEquals(booking5.getId(), result.get(1).getId());
@@ -133,14 +132,18 @@ class BookingRepositoryTest {
 
     @Test
     void shouldReturnBookingByIdAndEndTimeBeforeLocalDateTimeNowPlus9Days() {
-        List<Booking> result = bookingRepository.findAllByBookerIdAndEndBeforeOrderByEndDesc(user1.getId(), LocalDateTime.now().plusDays(9), Pageable.unpaged());
+        List<Booking> result = bookingRepository.findAllByBookerIdAndEndBeforeOrderByEndDesc(user1.getId(),
+                now.plusDays(9),
+                Pageable.unpaged());
         assertEquals(1, result.size());
         assertEquals(booking1.getId(), result.get(0).getId());
     }
 
     @Test
     void shouldFindBookingByBookerIdAndStartTimeAfterCurrentTimePlus2Days() {
-        List<Booking> result = bookingRepository.findAllByBookerIdAndStartAfterOrderByStartDesc(user1.getId(), LocalDateTime.now().plusDays(2), Pageable.unpaged());
+        List<Booking> result = bookingRepository.findAllByBookerIdAndStartAfterOrderByStartDesc(user1.getId(),
+                now.plusDays(2),
+                Pageable.unpaged());
         List<Booking> expected = List.of(booking4, booking1);
         assertEquals(2, result.size());
         assertEquals(expected.get(0).getId(), result.get(0).getId());
@@ -149,14 +152,17 @@ class BookingRepositoryTest {
 
     @Test
     void shouldFindAllByBookerIdAndStatus() {
-        List<Booking> result = bookingRepository.findAllByBookerIdAndStatusOrderByStartAsc(user1.getId(), BookingStatus.REJECTED, Pageable.unpaged());
+        List<Booking> result = bookingRepository.findAllByBookerIdAndStatusOrderByStartAsc(user1.getId(),
+                BookingStatus.REJECTED,
+                Pageable.unpaged());
         assertEquals(1, result.size());
         assertEquals(booking4.getId(), result.get(0).getId());
     }
 
     @Test
     void shouldFindByItemOwnerId() {
-        List<Booking> result = bookingRepository.findAllByItemOwnerIdOrderByStartDesc(user3.getId(), Pageable.unpaged());
+        List<Booking> result = bookingRepository.findAllByItemOwnerIdOrderByStartDesc(user3.getId(),
+                Pageable.unpaged());
         assertEquals(4, result.size());
         assertEquals(booking4.getId(), result.get(0).getId());
         assertEquals(booking6.getId(), result.get(1).getId());
@@ -164,51 +170,63 @@ class BookingRepositoryTest {
     }
 
     @Test
-    void shouldFindByItemOwnerIdAndEndBeforeCurrentTimePlus9Days() {
-        List<Booking> result = bookingRepository.findAllByItemOwnerIdAndEndBeforeOrderByEndDesc(user1.getId(), LocalDateTime.now().plusDays(9), Pageable.unpaged());
+    void shouldFindByItemOwnerIdIfEndBeforeCurrentTimePlus9Days() {
+        List<Booking> result = bookingRepository.findAllByItemOwnerIdAndEndBeforeOrderByEndDesc(user1.getId(),
+                now.plusDays(9),
+                Pageable.unpaged());
         assertEquals(1, result.size());
         assertEquals(booking1.getId(), result.get(0).getId());
     }
 
     @Test
-    void shouldFindByItemOwnerIdAndStartAfter7Days() {
-        List<Booking> result = bookingRepository.findAllByItemOwnerIdAndStartAfterOrderByStartDesc(user1.getId(), LocalDateTime.now().plusDays(7), Pageable.unpaged());
+    void shouldFindByItemOwnerIdIfStartAfter7Days() {
+        List<Booking> result = bookingRepository.findAllByItemOwnerIdAndStartAfterOrderByStartDesc(user1.getId(),
+                now.plusDays(7),
+                Pageable.unpaged());
         assertEquals(1, result.size());
         assertEquals(booking2.getId(), result.get(0).getId());
     }
 
     @Test
-    void shouldFindByItemOwnerIdAndBookingStatusWaiting() {
-        List<Booking> result = bookingRepository.findAllByItemOwnerIdAndStatusOrderByStartAsc(user1.getId(), BookingStatus.WAITING, Pageable.unpaged());
+    void shouldFindByItemOwnerIdIfBookingStatusWaiting() {
+        List<Booking> result = bookingRepository.findAllByItemOwnerIdAndStatusOrderByStartAsc(user1.getId(),
+                BookingStatus.WAITING, Pageable.unpaged());
         assertEquals(1, result.size());
         assertEquals(booking1.getId(), result.get(0).getId());
         assertEquals(booking1.getStatus(), result.get(0).getStatus());
     }
 
     @Test
-    void shouldFindByItemIdAndEndBeforeCurrentTimePlus13Days() {
-        Booking result = bookingRepository.findFirstByItemIdAndEndBeforeOrderByEndDesc(item2.getId(), LocalDateTime.now().plusDays(13));
+    void shouldFindByItemIdIfEndBeforeCurrentTimePlus13Days() {
+        Booking result = bookingRepository.findFirstByItemIdAndEndBeforeOrderByEndDesc(item2.getId(), now.plusDays(13));
         assertEquals(booking4.getId(), result.getId());
         assertEquals(booking4.getEnd(), result.getEnd());
     }
 
     @Test
-    void shouldFindByItemIdAndStartAfterCurrentTimePlus7Days() {
-        Booking result = bookingRepository.findFirstByItemIdAndStartAfterOrderByStartAsc(item2.getId(), LocalDateTime.now().plusDays(7));
+    void shouldFindByItemIdIfStartAfterCurrentTimePlus7Days() {
+        Booking result = bookingRepository.findFirstByItemIdAndStartAfterOrderByStartAsc(item2.getId(),
+                now.plusDays(7));
         assertEquals(booking4.getId(), result.getId());
         assertEquals(booking4.getStart(), result.getStart());
     }
 
     @Test
-    void shouldFindByBookerIdAndStartBeforeCurrentTimePlus9DaysAndEndAfterCurrentTimePlus11Days() {
-        List<Booking> result = bookingRepository.findByBookerIdAndStartBeforeAndEndAfter(user1.getId(), LocalDateTime.now().plusDays(9), LocalDateTime.now().plusDays(11), Pageable.unpaged());
+    void shouldFindByBookerIdIfStartBeforeCurrentTimePlus9DaysAndEndAfterCurrentTimePlus11Days() {
+        List<Booking> result = bookingRepository.findByBookerIdAndStartBeforeAndEndAfter(user1.getId(),
+                now.plusDays(9),
+                now.plusDays(11),
+                Pageable.unpaged());
         assertEquals(1L, result.size());
         assertEquals(booking4.getId(), result.get(0).getId());
     }
 
     @Test
-    void shouldFindByItemOwnerIdAndStartBeforeCurrentTimePlus9DaysAndEndAfterCurrentTimePlus11Days() {
-        List<Booking> result = bookingRepository.findAllByItemOwnerIdAndStartBeforeAndEndAfter(user1.getId(), LocalDateTime.now().plusDays(9), LocalDateTime.now().plusDays(11), Pageable.unpaged());
+    void shouldFindByItemOwnerIdIfStartBeforeCurrentTimePlus9DaysAndEndAfterCurrentTimePlus11Days() {
+        List<Booking> result = bookingRepository.findAllByItemOwnerIdAndStartBeforeAndEndAfter(user1.getId(),
+                now.plusDays(9),
+                now.plusDays(11),
+                Pageable.unpaged());
         assertEquals(1L, result.size());
         assertEquals(booking2.getId(), result.get(0).getId());
     }

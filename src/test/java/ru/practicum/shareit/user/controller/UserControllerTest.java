@@ -24,19 +24,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(controllers = UserController.class)
 class UserControllerTest {
     @Autowired
-    ObjectMapper mapper;
+    private ObjectMapper mapper;
 
     @MockBean
-    UserService userService;
+    private UserService userService;
 
     @Autowired
-    MockMvc mvc;
+    private MockMvc mvc;
 
-    UserDto userDto = new UserDto(1L, "User", "user@email.ru");
-    User user = UserDtoMapper.toUser(userDto);
+    private final UserDto userDto = new UserDto(1L, "User", "user@email.ru");
+    private final User user = UserDtoMapper.toUser(userDto);
 
     @Test
-    void createUser() throws Exception {
+    void shouldReturnStatus200WhenUserCreated() throws Exception {
         when(userService.createUser(any()))
                 .thenReturn(user);
 
@@ -51,7 +51,7 @@ class UserControllerTest {
     }
 
     @Test
-    void updateUser() throws Exception {
+    void shouldReturnStatus200WhenUserUpdated() throws Exception {
         when(userService.updateUser(any(), any()))
                 .thenReturn(user);
 
@@ -66,7 +66,7 @@ class UserControllerTest {
     }
 
     @Test
-    void getUserById() throws Exception {
+    void shouldReturnStatus200WhenGetUserByValidId() throws Exception {
         when(userService.getUserById(any()))
                 .thenReturn(user);
 
@@ -79,7 +79,7 @@ class UserControllerTest {
     }
 
     @Test
-    void getAllUsers() throws Exception {
+    void shouldReturnStatus200WhenGetAllUsers() throws Exception {
         when(userService.getAllUsers())
                 .thenReturn(List.of(user));
 
@@ -92,7 +92,7 @@ class UserControllerTest {
     }
 
     @Test
-    void deleteUserById() throws Exception {
+    void shouldInteractWithDeleteAllMethod() throws Exception {
         mvc.perform(delete("/users/1"))
                 .andExpect(status().isOk());
     }

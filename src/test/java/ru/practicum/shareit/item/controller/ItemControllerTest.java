@@ -30,38 +30,39 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(controllers = ItemController.class)
 class ItemControllerTest {
 
-    static ItemDto itemDto = ItemDto.builder()
+    private static final ItemDto itemDto = ItemDto.builder()
             .id(1L)
             .name("Item")
             .description("Description")
             .available(true)
             .ownerId(1L)
             .build();
-    static Item item = ItemDtoMapper.toItem(itemDto);
-    @Autowired
-    ObjectMapper mapper;
-    @MockBean
-    ItemService itemService;
-    @Autowired
-    MockMvc mvc;
-    ItemInfoDto itemInfoDto = ItemInfoDto.builder()
+    private static final Item item = ItemDtoMapper.toItem(itemDto);
+    private static final String HEADER = "X-User-Sharer-Id";
+    private final ItemInfoDto itemInfoDto = ItemInfoDto.builder()
             .id(1L)
             .name("Item")
             .description("Description")
             .available(true)
             .build();
-    CommentDto commentDto = CommentDto.builder()
+    private final CommentDto commentDto = CommentDto.builder()
             .text("Comment")
             .id(1L)
             .authorName("Name")
             .build();
-    Comment comment = Comment.builder()
+    private final Comment comment = Comment.builder()
             .id(1L)
             .text("Comment")
             .author(new User(1L, "Name", "user@email.com"))
             .item(item)
             .created(LocalDateTime.now())
             .build();
+    @Autowired
+    private ObjectMapper mapper;
+    @MockBean
+    private ItemService itemService;
+    @Autowired
+    private MockMvc mvc;
 
     @BeforeAll
     static void beforeAll() {
@@ -69,11 +70,11 @@ class ItemControllerTest {
     }
 
     @Test
-    void createItem() throws Exception {
+    void shouldReturnStatus200IfItemCreated() throws Exception {
         when(itemService.createItem(any(), anyLong()))
                 .thenReturn(item);
         mvc.perform(post("/items")
-                        .header("X-Sharer-User-Id", 1L)
+                        .header(HEADER, 1L)
                         .content(mapper.writeValueAsString(itemDto))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -85,13 +86,13 @@ class ItemControllerTest {
     }
 
     @Test
-    void updateItem() throws Exception {
+    void shouldReturnStatus200IfItemUpdated() throws Exception {
         when(itemService.updateItem(anyLong(), any(), anyLong()))
                 .thenReturn(item);
 
         mvc.perform(patch("/items/1")
                         .content(mapper.writeValueAsString(itemDto))
-                        .header("X-Sharer-User-Id", 1)
+                        .header(HEADER, 1)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -102,13 +103,13 @@ class ItemControllerTest {
     }
 
     @Test
-    void getItemById() throws Exception {
+    void shouldReturnStatus200WhenGetItemByValidId() throws Exception {
         when(itemService.getItemById(anyLong(), anyLong()))
                 .thenReturn(itemInfoDto);
 
         mvc.perform(get("/items/1")
                         .accept(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", 1))
+                        .header(HEADER, 1))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(itemInfoDto.getId()), Long.class))
                 .andExpect(jsonPath("$.name", is(itemInfoDto.getName())))
@@ -116,12 +117,12 @@ class ItemControllerTest {
     }
 
     @Test
-    void getItemByOwnerId() throws Exception {
+    void shouldReturnStatus200WhenGetByValidOwnerId() throws Exception {
         when(itemService.getItemByOwnerId(anyLong(), anyInt(), anyInt()))
                 .thenReturn(List.of(itemInfoDto));
 
         mvc.perform(get("/items")
-                        .header("X-Sharer-User-Id", 1)
+                        .header(HEADER, 1)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$[0].id", is(itemInfoDto.getId()), Long.class))
                 .andExpect(jsonPath("$[0].name", is(itemInfoDto.getName())))
@@ -129,13 +130,13 @@ class ItemControllerTest {
     }
 
     @Test
-    void searchBy() throws Exception {
+    void shouldReturnStatus200WhenSearchIsSuccessful() throws Exception {
         when(itemService.searchBy(any(), anyInt(), anyInt()))
                 .thenReturn(List.of(item));
 
         mvc.perform(get("/items/search?text=Description")
                         .accept(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", 1))
+                        .header(HEADER, 1))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id", is(itemDto.getId()), Long.class))
                 .andExpect(jsonPath("$[0].name", is(itemDto.getName())))
@@ -144,12 +145,12 @@ class ItemControllerTest {
     }
 
     @Test
-    void createComment() throws Exception {
+    void shouldReturnStatus200WhenCommentCreated() throws Exception {
         when(itemService.createComment(any(), anyLong(), anyLong()))
                 .thenReturn(comment);
 
         mvc.perform(post("/items/1/comment")
-                        .header("X-Sharer-User-Id", 1)
+                        .header(HEADER, 1)
                         .content(mapper.writeValueAsString(commentDto))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))

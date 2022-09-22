@@ -26,16 +26,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(controllers = ItemRequestController.class)
 class ItemRequestControllerTest {
+    private final static String HEADER = "X-Sharer-User-Id";
     @Autowired
-    ObjectMapper mapper;
+    private ObjectMapper mapper;
     @MockBean
-    ItemRequestService itemRequestService;
+    private ItemRequestService itemRequestService;
     @Autowired
-    MockMvc mvc;
-    User user = new User(1L, "User", "user@email.com");
-    LocalDateTime now = LocalDateTime.now().withNano(0);
-    ItemRequest itemRequest = new ItemRequest(1L, "Description", user, now);
-    ItemRequestDto itemRequestDto = ItemRequestDtoMapper.toItemRequestDto(itemRequest);
+    private MockMvc mvc;
+    private final User user = new User(1L, "User", "user@email.com");
+    private final LocalDateTime now = LocalDateTime.now().withNano(0);
+    private final ItemRequest itemRequest = new ItemRequest(1L, "Description", user, now);
+    private final ItemRequestDto itemRequestDto = ItemRequestDtoMapper.toItemRequestDto(itemRequest);
 
     @Test
     void createItemRequest() throws Exception {
@@ -46,7 +47,7 @@ class ItemRequestControllerTest {
                         .content(mapper.writeValueAsString(itemRequestDto))
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", 1))
+                        .header(HEADER, 1))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(itemRequestDto.getId()), Long.class))
                 .andExpect(jsonPath("$.description", is(itemRequestDto.getDescription())))
@@ -60,7 +61,7 @@ class ItemRequestControllerTest {
 
         mvc.perform(get("/requests")
                         .accept(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", 1))
+                        .header(HEADER, 1))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id", is(itemRequestDto.getId()), Long.class))
                 .andExpect(jsonPath("$[0].description", is(itemRequestDto.getDescription())))
@@ -74,7 +75,7 @@ class ItemRequestControllerTest {
 
         mvc.perform(get("/requests/all")
                         .accept(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", 1))
+                        .header(HEADER, 1))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id", is(itemRequestDto.getId()), Long.class))
                 .andExpect(jsonPath("$[0].description", is(itemRequestDto.getDescription())))
@@ -87,7 +88,7 @@ class ItemRequestControllerTest {
                 .thenReturn(itemRequestDto);
 
         mvc.perform(get("/requests/1")
-                        .header("X-Sharer-User-Id", 1)
+                        .header(HEADER, 1)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(itemRequestDto.getId()), Long.class))

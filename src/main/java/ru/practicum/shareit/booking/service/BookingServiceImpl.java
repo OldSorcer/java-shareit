@@ -74,7 +74,7 @@ public class BookingServiceImpl implements BookingService {
         findUser(userId);
         List<Booking> bookings = new ArrayList<>();
         LocalDateTime now = LocalDateTime.now();
-        Pageable page = PageRequest.of(from / size, size);
+        Pageable page = getOffset(from, size);
         switch (state) {
             case PAST:
                 bookings = bookingRepository.findAllByBookerIdAndEndBeforeOrderByEndDesc(userId, now, page);
@@ -103,7 +103,7 @@ public class BookingServiceImpl implements BookingService {
         findUser(userId);
         LocalDateTime now = LocalDateTime.now();
         List<Booking> bookings = new ArrayList<>();
-        Pageable page = PageRequest.of(from / size, size);
+        Pageable page = getOffset(from, size);
         switch (state) {
             case PAST:
                 bookings = bookingRepository.findAllByItemOwnerIdAndEndBeforeOrderByEndDesc(userId, now, page);
@@ -163,5 +163,9 @@ public class BookingServiceImpl implements BookingService {
         return bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new EntityNotFoundException(String.format("Бронирования с ID %d не существует",
                         bookingId)));
+    }
+
+    private Pageable getOffset(int from, int size) {
+        return PageRequest.of(from / size, size);
     }
 }
