@@ -38,7 +38,7 @@ class ItemControllerTest {
             .ownerId(1L)
             .build();
     private static final Item item = ItemDtoMapper.toItem(itemDto);
-    private static final String HEADER = "X-User-Sharer-Id";
+    private final String header = "X-User-Sharer-Id";
     private final ItemInfoDto itemInfoDto = ItemInfoDto.builder()
             .id(1L)
             .name("Item")
@@ -74,7 +74,7 @@ class ItemControllerTest {
         when(itemService.createItem(any(), anyLong()))
                 .thenReturn(item);
         mvc.perform(post("/items")
-                        .header(HEADER, 1L)
+                        .header(header, 1L)
                         .content(mapper.writeValueAsString(itemDto))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -92,7 +92,7 @@ class ItemControllerTest {
 
         mvc.perform(patch("/items/1")
                         .content(mapper.writeValueAsString(itemDto))
-                        .header(HEADER, 1)
+                        .header(header, 1)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -109,7 +109,7 @@ class ItemControllerTest {
 
         mvc.perform(get("/items/1")
                         .accept(MediaType.APPLICATION_JSON)
-                        .header(HEADER, 1))
+                        .header(header, 1))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(itemInfoDto.getId()), Long.class))
                 .andExpect(jsonPath("$.name", is(itemInfoDto.getName())))
@@ -122,7 +122,7 @@ class ItemControllerTest {
                 .thenReturn(List.of(itemInfoDto));
 
         mvc.perform(get("/items")
-                        .header(HEADER, 1)
+                        .header(header, 1)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$[0].id", is(itemInfoDto.getId()), Long.class))
                 .andExpect(jsonPath("$[0].name", is(itemInfoDto.getName())))
@@ -136,7 +136,7 @@ class ItemControllerTest {
 
         mvc.perform(get("/items/search?text=Description")
                         .accept(MediaType.APPLICATION_JSON)
-                        .header(HEADER, 1))
+                        .header(header, 1))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id", is(itemDto.getId()), Long.class))
                 .andExpect(jsonPath("$[0].name", is(itemDto.getName())))
@@ -150,7 +150,7 @@ class ItemControllerTest {
                 .thenReturn(comment);
 
         mvc.perform(post("/items/1/comment")
-                        .header(HEADER, 1)
+                        .header(header, 1)
                         .content(mapper.writeValueAsString(commentDto))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))

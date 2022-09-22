@@ -26,7 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(controllers = ItemRequestController.class)
 class ItemRequestControllerTest {
-    private final static String HEADER = "X-Sharer-User-Id";
+    private final String header = "X-Sharer-User-Id";
     @Autowired
     private ObjectMapper mapper;
     @MockBean
@@ -47,7 +47,7 @@ class ItemRequestControllerTest {
                         .content(mapper.writeValueAsString(itemRequestDto))
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header(HEADER, 1))
+                        .header(header, 1))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(itemRequestDto.getId()), Long.class))
                 .andExpect(jsonPath("$.description", is(itemRequestDto.getDescription())))
@@ -61,7 +61,7 @@ class ItemRequestControllerTest {
 
         mvc.perform(get("/requests")
                         .accept(MediaType.APPLICATION_JSON)
-                        .header(HEADER, 1))
+                        .header(header, 1))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id", is(itemRequestDto.getId()), Long.class))
                 .andExpect(jsonPath("$[0].description", is(itemRequestDto.getDescription())))
@@ -75,7 +75,7 @@ class ItemRequestControllerTest {
 
         mvc.perform(get("/requests/all")
                         .accept(MediaType.APPLICATION_JSON)
-                        .header(HEADER, 1))
+                        .header(header, 1))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id", is(itemRequestDto.getId()), Long.class))
                 .andExpect(jsonPath("$[0].description", is(itemRequestDto.getDescription())))
@@ -88,7 +88,7 @@ class ItemRequestControllerTest {
                 .thenReturn(itemRequestDto);
 
         mvc.perform(get("/requests/1")
-                        .header(HEADER, 1)
+                        .header(header, 1)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(itemRequestDto.getId()), Long.class))

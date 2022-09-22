@@ -27,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(controllers = BookingController.class)
 class BookingControllerTest {
-    private final static String HEADER = "X-Sharer-User-Id";
+    private final String header = "X-Sharer-User-Id";
     private final User user = new User(1L, "User", "user@email.ru");
     private final Item item = new Item(1L, "Item", "Description", true, user, null);
     private final Booking booking = new Booking(1L, LocalDateTime.now().withNano(0), LocalDateTime.now().withNano(0), item, user, BookingStatus.WAITING);
@@ -48,7 +48,7 @@ class BookingControllerTest {
         when(bookingService.createBooking(any(), anyLong(), anyLong()))
                 .thenReturn(bookingEntryDto);
         mvc.perform(post("/bookings")
-                        .header(HEADER, 1)
+                        .header(header, 1)
                         .content(mapper.writeValueAsString(bookingEntryDto))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -65,7 +65,7 @@ class BookingControllerTest {
 
         mvc.perform(patch("/bookings/1?approved=true")
                         .accept(MediaType.APPLICATION_JSON)
-                        .header(HEADER, 1))
+                        .header(header, 1))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(bookingDto.getId()), Long.class))
                 .andExpect(jsonPath("$.start", is(String.format("%s", bookingDto.getStart()))))
@@ -81,7 +81,7 @@ class BookingControllerTest {
 
         mvc.perform(get("/bookings/1")
                         .accept(MediaType.APPLICATION_JSON)
-                        .header(HEADER, 1))
+                        .header(header, 1))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(bookingDto.getId()), Long.class))
                 .andExpect(jsonPath("$.start", is(String.format("%s", bookingDto.getStart()))))
@@ -96,7 +96,7 @@ class BookingControllerTest {
 
         mvc.perform(get("/bookings")
                         .accept(MediaType.APPLICATION_JSON)
-                        .header(HEADER, 1))
+                        .header(header, 1))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id", is(bookingDto.getId()), Long.class))
                 .andExpect(jsonPath("$[0].start", is(String.format("%s", bookingDto.getStart()))))
@@ -111,7 +111,7 @@ class BookingControllerTest {
 
         mvc.perform(get("/bookings/owner")
                         .accept(MediaType.APPLICATION_JSON)
-                        .header(HEADER, 1))
+                        .header(header, 1))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id", is(bookingDto.getId()), Long.class))
                 .andExpect(jsonPath("$[0].start", is(String.format("%s", bookingDto.getStart()))))
