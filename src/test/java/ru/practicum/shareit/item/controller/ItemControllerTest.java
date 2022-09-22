@@ -38,7 +38,7 @@ class ItemControllerTest {
             .ownerId(1L)
             .build();
     private static final Item item = ItemDtoMapper.toItem(itemDto);
-    private final String header = "X-User-Sharer-Id";
+    private final String header = "X-Sharer-User-Id";
     private final ItemInfoDto itemInfoDto = ItemInfoDto.builder()
             .id(1L)
             .name("Item")
