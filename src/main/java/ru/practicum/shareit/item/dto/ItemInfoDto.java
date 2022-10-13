@@ -16,6 +16,7 @@ public class ItemInfoDto {
     private Booking lastBooking;
     private Booking nextBooking;
     private List<CommentDto> comments;
+    private Long requestId;
 
     @Data
     @Builder

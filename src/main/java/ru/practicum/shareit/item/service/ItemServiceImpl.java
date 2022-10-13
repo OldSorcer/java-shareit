@@ -1,6 +1,8 @@
 package ru.practicum.shareit.item.service;
 
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.booking.model.Booking;
@@ -13,6 +15,7 @@ import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.storage.CommentRepository;
 import ru.practicum.shareit.item.storage.ItemRepository;
+import ru.practicum.shareit.requests.storage.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.storage.UserRepository;
 
@@ -29,11 +32,17 @@ public class ItemServiceImpl implements ItemService {
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
+    private final ItemRequestRepository itemRequestRepository;
 
     @Override
     public Item createItem(Item item, Long ownerId) {
         User foundedUser = checkUser(ownerId);
         item.setOwner(foundedUser);
+        if (Objects.nonNull(item.getRequest())) {
+            item.setRequest(itemRequestRepository.findById(item.getRequest().getId())
+                    .orElseThrow(() -> new EntityNotFoundException(String.format("Запроса с ID %d не существует",
+                            item.getRequest().getId()))));
+        }
         return itemRepository.save(item);
     }
 
@@ -56,9 +65,10 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemInfoDto> getItemByOwnerId(Long ownerId) {
+    public List<ItemInfoDto> getItemByOwnerId(Long ownerId, int from, int size) {
         checkUser(ownerId);
-        List<Item> items = itemRepository.findByOwnerIdOrderById(ownerId);
+        Pageable page = PageRequest.of(from / size, size);
+        List<Item> items = itemRepository.findByOwnerIdOrderById(ownerId, page);
         LocalDateTime now = LocalDateTime.now();
         Booking lastBooking;
         Booking nextBooking;
@@ -89,11 +99,12 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<Item> searchBy(String word) {
+    public List<Item> searchBy(String word, int from, int size) {
         if (word.isEmpty() || word.isBlank()) {
             return new ArrayList<>();
         }
-        return itemRepository.searchBy(word);
+        Pageable page = PageRequest.of(from / size, size);
+        return itemRepository.searchBy(word, page);
     }
 
     @Override

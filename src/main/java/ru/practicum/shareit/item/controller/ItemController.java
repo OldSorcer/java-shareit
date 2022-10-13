@@ -3,7 +3,6 @@ package ru.practicum.shareit.item.controller;
 import lombok.AllArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
@@ -11,6 +10,8 @@ import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.validator.groups.Create;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 /**
@@ -22,7 +23,6 @@ import java.util.List;
 public class ItemController {
     private static final String USER_ID_HEADER = "X-Sharer-User-Id";
     private final ItemService itemService;
-    private final BookingService bookingService;
 
     @PostMapping
     public ItemDto createItem(@RequestBody @Validated({Create.class}) ItemDto itemDto,
@@ -45,13 +45,17 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<ItemInfoDto> getItemsByOwnerId(@RequestHeader(USER_ID_HEADER) Long ownerId) {
-        return itemService.getItemByOwnerId(ownerId);
+    public List<ItemInfoDto> getItemsByOwnerId(@RequestHeader(USER_ID_HEADER) Long ownerId,
+                                               @PositiveOrZero @RequestParam(defaultValue = "0", required = false) int from,
+                                               @Positive @RequestParam(defaultValue = "10", required = false) int size) {
+        return itemService.getItemByOwnerId(ownerId, from, size);
     }
 
     @GetMapping("/search")
-    public List<ItemDto> searchBy(@RequestParam String text) {
-        return ItemDtoMapper.toItemDto(itemService.searchBy(text));
+    public List<ItemDto> searchBy(@RequestParam String text,
+                                  @PositiveOrZero @RequestParam(defaultValue = "0", required = false) int from,
+                                  @Positive @RequestParam(defaultValue = "10", required = false) int size) {
+        return ItemDtoMapper.toItemDto(itemService.searchBy(text, from, size));
     }
 
     @PostMapping("/{itemId}/comment")

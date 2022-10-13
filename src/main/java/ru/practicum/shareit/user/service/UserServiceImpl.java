@@ -3,7 +3,6 @@ package ru.practicum.shareit.user.service;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.EntityNotFoundException;
-import ru.practicum.shareit.exception.InvalidArgumentException;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.storage.UserRepository;
 
@@ -17,7 +16,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User createUser(User user) {
-        /*checkEmail(user.getEmail());*/
         return userRepository.save(user);
     }
 
@@ -42,13 +40,6 @@ public class UserServiceImpl implements UserService {
     public User updateUser(Long userId, User user) {
         User updatedUser = setStatement(userId, user);
         return userRepository.save(updatedUser);
-    }
-
-    private void checkEmail(String email) {
-        boolean isDuplicate = userRepository.findByEmailContainsIgnoreCase(email).isPresent();
-        if (isDuplicate) {
-            throw new InvalidArgumentException("Пользователь с таким email уже существует");
-        }
     }
 
     private User setStatement(Long userId, User user) {
