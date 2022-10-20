@@ -8,7 +8,6 @@ import ru.practicum.shareit.booking.dto.BookingDtoMapper;
 import ru.practicum.shareit.booking.model.BookingState;
 import ru.practicum.shareit.booking.service.BookingService;
 
-import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -47,7 +46,6 @@ public class BookingController {
     }
 
     @GetMapping("/owner")
-    @Valid
     public List<BookingDto> getBookingsByOwnerId(@RequestParam(defaultValue = "ALL", required = false) BookingState state,
                                                  @RequestHeader(USER_ID_HEADER) Long userId,
                                                  @RequestParam(defaultValue = "0", required = false) Integer from,

@@ -6,12 +6,7 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.groups.Create;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 
-/**
- * // TODO .
- */
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -24,13 +19,8 @@ public class Item {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @NotNull(groups = {Create.class})
-    @NotBlank(groups = {Create.class})
     private String name;
-    @NotNull(groups = {Create.class})
-    @NotBlank(groups = {Create.class})
     private String description;
-    @NotNull(groups = {Create.class})
     private Boolean available;
     @ManyToOne
     @JoinColumn(name = "owner_id")

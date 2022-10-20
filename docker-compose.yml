@@ -6,7 +6,7 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - SHAREIT-SERVER_URL=http://server:9090
+      - SHAREIT_SERVER_URL=http://server:9090
 
   server:
     build: ./server
@@ -17,15 +17,14 @@ services:
       - db
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/postgres
-      - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=postgres
 
   db:
-    image: postgres:14-alpine
-    container_name: ShareIt
+    image: postgres:14
+    container_name: ShareIt-db
     ports:
-      - "5432:5432"
+      - "6541:5432"
     volumes:
       - /var/lib/postgresql/data/
     environment:
+      - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres

@@ -7,7 +7,6 @@ import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
 
-import javax.validation.constraints.Positive;
 import java.util.List;
 
 /**
@@ -43,7 +42,7 @@ public class ItemController {
     @GetMapping
     public List<ItemInfoDto> getItemsByOwnerId(@RequestHeader(USER_ID_HEADER) Long ownerId,
                                                @RequestParam(defaultValue = "0", required = false) int from,
-                                               @Positive @RequestParam(defaultValue = "10", required = false) int size) {
+                                               @RequestParam(defaultValue = "10", required = false) int size) {
         return itemService.getItemByOwnerId(ownerId, from, size);
     }
 
