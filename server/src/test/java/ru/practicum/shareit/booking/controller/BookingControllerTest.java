@@ -9,6 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingDtoMapper;
+import ru.practicum.shareit.booking.dto.BookingInfoDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.service.BookingService;
@@ -31,7 +32,7 @@ class BookingControllerTest {
     private final User user = new User(1L, "User", "user@email.ru");
     private final Item item = new Item(1L, "Item", "Description", true, user, null);
     private final Booking booking = new Booking(1L, LocalDateTime.now().withNano(0), LocalDateTime.now().withNano(0), item, user, BookingStatus.WAITING);
-    private final BookingDto bookingDto = BookingDtoMapper.toBookingDto(booking);
+    private final BookingInfoDto bookingDto = BookingDtoMapper.toBookingInfoDto(booking);
     private final BookingDto bookingEntryDto = new BookingDto();
     @Autowired
     private ObjectMapper mapper;
@@ -42,18 +43,22 @@ class BookingControllerTest {
 
     @Test
     void shouldReturn200WhenBookingIsCreated() throws Exception {
-        bookingEntryDto.setStart(LocalDateTime.now().withNano(0));
-        bookingEntryDto.setEnd(LocalDateTime.MAX.withNano(0));
+        LocalDateTime start = LocalDateTime.now().withNano(0);
+        LocalDateTime end = LocalDateTime.MAX.withNano(0);
+        bookingEntryDto.setStart(start);
+        bookingEntryDto.setEnd(end);
+        bookingDto.setStart(start);
+        bookingDto.setEnd(end);
         bookingEntryDto.setItemId(item.getId());
         when(bookingService.createBooking(any(), anyLong(), anyLong()))
-                .thenReturn(bookingEntryDto);
+                .thenReturn(bookingDto);
         mvc.perform(post("/bookings")
                         .header(header, 1)
                         .content(mapper.writeValueAsString(bookingEntryDto))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(bookingEntryDto.getId()), Long.class))
+                .andExpect(jsonPath("$.id", is(bookingDto.getId()), Long.class))
                 .andExpect(jsonPath("$.start", is(String.format("%s", bookingEntryDto.getStart()))))
                 .andExpect(jsonPath("$.end", is(String.format("%s", bookingEntryDto.getEnd()))));
     }

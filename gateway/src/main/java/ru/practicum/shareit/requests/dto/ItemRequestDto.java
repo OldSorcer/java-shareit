@@ -20,8 +20,8 @@ import java.util.List;
 @Builder
 public class ItemRequestDto {
     private Long id;
-    @NotNull
-    @NotBlank
+    @NotNull(message = "Описание не может быть пустым")
+    @NotBlank(message = "Описание не может быть пустым")
     private String description;
     private Long requesterId;
     private LocalDateTime created;

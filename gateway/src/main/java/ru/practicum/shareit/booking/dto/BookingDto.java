@@ -5,6 +5,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.Future;
+import javax.validation.constraints.FutureOrPresent;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
@@ -13,36 +16,13 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class BookingDto {
-    private Long id;
-    @NotNull
-    private LocalDateTime start;
-    @NotNull
-    private LocalDateTime end;
-    @NotNull
+    @NotNull(message = "Идентификатор предмета не может быть пустым")
+    @Min(value = 1, message = "ID не может быть меньше 1")
     private Long itemId;
-    private Item item;
-    private User booker;
-    private BookingStatus status;
-
-    @Data
-    @AllArgsConstructor
-    public static class Item {
-        private Long id;
-        private String name;
-
-        public Item(ru.practicum.shareit.item.model.Item item) {
-            this.id = item.getId();
-            this.name = item.getName();
-        }
-    }
-
-    @Data
-    @AllArgsConstructor
-    public static class User {
-        private Long id;
-
-        public User(ru.practicum.shareit.user.model.User user) {
-            this.id = user.getId();
-        }
-    }
+    @NotNull(message = "Время начала бронирования не может быть пустым")
+    @FutureOrPresent(message = "Время начала бронирования должно начинаться с текущей или будущей даты")
+    private LocalDateTime start;
+    @NotNull(message = "Время окончания бронирования не может быть пустым")
+    @Future(message = "Время окончания бронирования должно быть указано позднее текущей даты")
+    private LocalDateTime end;
 }

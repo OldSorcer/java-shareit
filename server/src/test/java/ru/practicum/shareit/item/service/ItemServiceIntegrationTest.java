@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.dto.BookingInfoDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.service.BookingService;
@@ -53,7 +54,7 @@ class ItemServiceIntegrationTest {
         User createdBooker = userService.createUser(booker);
         Item createdItem = itemService.createItem(item, createdUser.getId());
         booking.setBooker(createdBooker);
-        BookingDto createdBooking = bookingService.createBooking(booking, createdBooker.getId(), createdItem.getId());
+        BookingInfoDto createdBooking = bookingService.createBooking(booking, createdBooker.getId(), createdItem.getId());
         List<ItemInfoDto> result = itemService.getItemByOwnerId(createdUser.getId(), 1, 10);
         assertEquals(1, result.size());
         assertEquals(createdItem.getId(), result.get(0).getId());

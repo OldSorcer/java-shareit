@@ -10,9 +10,6 @@ import ru.practicum.shareit.item.service.ItemService;
 
 import java.util.List;
 
-/**
- * // TODO .
- */
 @RestController
 @RequestMapping("/items")
 @AllArgsConstructor

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.client.BookingClient;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingState;
+import ru.practicum.shareit.booking.validator.BookingValidator;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
@@ -28,6 +29,7 @@ public class BookingController {
         log.info(
                 "[x] ShateIt-gateway: Получен POST запрос к эндпоинту /bookings"
         );
+        BookingValidator.validateBooking(bookingDto);
         return bookingClient.create(userId, bookingDto);
     }
 

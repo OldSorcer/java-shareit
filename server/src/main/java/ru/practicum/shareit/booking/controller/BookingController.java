@@ -6,6 +6,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingDtoMapper;
+import ru.practicum.shareit.booking.dto.BookingInfoDto;
 import ru.practicum.shareit.booking.model.BookingState;
 import ru.practicum.shareit.booking.service.BookingService;
 
@@ -21,8 +22,8 @@ public class BookingController {
     private final BookingService bookingService;
 
     @PostMapping
-    public BookingDto createBooking(@RequestBody BookingDto bookingDto,
-                                    @RequestHeader(USER_ID_HEADER) Long userId) {
+    public BookingInfoDto createBooking(@RequestBody BookingDto bookingDto,
+                                            @RequestHeader(USER_ID_HEADER) Long userId) {
         log.info(
                 "[x] ShateIt-server: Получен POST запрос к эндпоинту /bookings"
         );
@@ -30,7 +31,7 @@ public class BookingController {
     }
 
     @PatchMapping("/{bookingId}")
-    public BookingDto approveBooking(@PathVariable Long bookingId,
+    public BookingInfoDto approveBooking(@PathVariable Long bookingId,
                                      @RequestParam Boolean approved,
                                      @RequestHeader(USER_ID_HEADER) Long userId) {
         log.info(
@@ -40,7 +41,7 @@ public class BookingController {
     }
 
     @GetMapping("/{bookingId}")
-    public BookingDto getBookingById(@PathVariable Long bookingId,
+    public BookingInfoDto getBookingById(@PathVariable Long bookingId,
                                      @RequestHeader(USER_ID_HEADER) Long userId) {
         log.info(
                 "[x] ShateIt-server: Получен GET запрос к эндпоинту /bookings/{}", bookingId
@@ -49,7 +50,7 @@ public class BookingController {
     }
 
     @GetMapping
-    public List<BookingDto> getBookings(@RequestParam(defaultValue = "ALL", required = false) String state,
+    public List<BookingInfoDto> getBookings(@RequestParam(defaultValue = "ALL", required = false) String state,
                                         @RequestHeader(USER_ID_HEADER) Long userID,
                                         @RequestParam(defaultValue = "0", required = false) Integer from,
                                         @RequestParam(defaultValue = "10", required = false) Integer size) {
@@ -63,7 +64,7 @@ public class BookingController {
     }
 
     @GetMapping("/owner")
-    public List<BookingDto> getBookingsByOwnerId(@RequestParam(defaultValue = "ALL", required = false) BookingState state,
+    public List<BookingInfoDto> getBookingsByOwnerId(@RequestParam(defaultValue = "ALL", required = false) BookingState state,
                                                  @RequestHeader(USER_ID_HEADER) Long userId,
                                                  @RequestParam(defaultValue = "0", required = false) Integer from,
                                                  @RequestParam(defaultValue = "10", required = false) Integer size) {

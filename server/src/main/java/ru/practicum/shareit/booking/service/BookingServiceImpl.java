@@ -4,8 +4,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingDtoMapper;
+import ru.practicum.shareit.booking.dto.BookingInfoDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingState;
 import ru.practicum.shareit.booking.model.BookingStatus;
@@ -29,7 +29,7 @@ public class BookingServiceImpl implements BookingService {
     private final ItemRepository itemRepository;
 
     @Override
-    public BookingDto createBooking(Booking booking, Long userId, Long itemId) {
+    public BookingInfoDto createBooking(Booking booking, Long userId, Long itemId) {
         booking.setStatus(BookingStatus.WAITING);
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new EntityNotFoundException(String.format("Вещи с ID %d не существует", itemId)));
@@ -37,11 +37,11 @@ public class BookingServiceImpl implements BookingService {
         booking.setBooker(user);
         booking.setItem(item);
         checkBooking(booking);
-        return BookingDtoMapper.toBookingDto(bookingRepository.save(booking));
+        return BookingDtoMapper.toBookingInfoDto(bookingRepository.save(booking));
     }
 
     @Override
-    public BookingDto approveBooking(Long bookingId, Boolean approved, Long userId) {
+    public BookingInfoDto approveBooking(Long bookingId, Boolean approved, Long userId) {
         Booking booking = findBooking(bookingId);
         findUser(userId);
         if (!booking.getItem().getOwner().getId().equals(userId)) {
@@ -58,19 +58,19 @@ public class BookingServiceImpl implements BookingService {
         } else {
             booking.setStatus(BookingStatus.REJECTED);
         }
-        return BookingDtoMapper.toBookingDto(bookingRepository.save(booking));
+        return BookingDtoMapper.toBookingInfoDto(bookingRepository.save(booking));
     }
 
     @Override
-    public BookingDto getBookingById(Long bookingId, Long userID) {
+    public BookingInfoDto getBookingById(Long bookingId, Long userID) {
         Booking foundedBooking = findBooking(bookingId);
         findUser(userID);
         checkBookingAccess(foundedBooking, userID);
-        return BookingDtoMapper.toBookingDto(foundedBooking);
+        return BookingDtoMapper.toBookingInfoDto(foundedBooking);
     }
 
     @Override
-    public List<BookingDto> getBookings(BookingState state, Long userId, int from, int size) {
+    public List<BookingInfoDto> getBookings(BookingState state, Long userId, int from, int size) {
         findUser(userId);
         List<Booking> bookings = new ArrayList<>();
         LocalDateTime now = LocalDateTime.now();
@@ -95,11 +95,11 @@ public class BookingServiceImpl implements BookingService {
                 bookings = bookingRepository.findByBookerIdAndStartBeforeAndEndAfter(userId, now, now, page);
                 break;
         }
-        return BookingDtoMapper.toBookingDto(bookings);
+        return BookingDtoMapper.toBookingInfoDto(bookings);
     }
 
     @Override
-    public List<BookingDto> getBookingsByOwnerId(BookingState state, Long userId, int from, int size) {
+    public List<BookingInfoDto> getBookingsByOwnerId(BookingState state, Long userId, int from, int size) {
         findUser(userId);
         LocalDateTime now = LocalDateTime.now();
         List<Booking> bookings = new ArrayList<>();
@@ -124,7 +124,7 @@ public class BookingServiceImpl implements BookingService {
                 bookings = bookingRepository.findAllByItemOwnerIdAndStartBeforeAndEndAfter(userId, now, now, page);
                 break;
         }
-        return BookingDtoMapper.toBookingDto(bookings);
+        return BookingDtoMapper.toBookingInfoDto(bookings);
     }
 
     private void checkBooking(Booking booking) {

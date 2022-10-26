@@ -18,13 +18,13 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 public class ItemDto {
     private Long id;
-    @NotNull(groups = {Create.class})
-    @NotBlank(groups = {Create.class})
+    @NotNull(groups = {Create.class}, message = "Название вещи не может быт пустым")
+    @NotBlank(groups = {Create.class}, message = "Название вещи не может быт пустым")
     private String name;
-    @NotNull(groups = {Create.class})
-    @NotBlank(groups = {Create.class})
+    @NotNull(groups = {Create.class}, message = "Описание вещи не может быт пустым")
+    @NotBlank(groups = {Create.class}, message = "Описание вещи не может быт пустым")
     private String description;
-    @NotNull(groups = {Create.class})
+    @NotNull(groups = {Create.class}, message = "Необходимо установить доступ к предмету")
     private Boolean available;
     private Long ownerId;
     private Long requestId;
