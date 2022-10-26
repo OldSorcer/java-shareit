@@ -5,7 +5,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingInfoDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingState;
@@ -31,10 +30,10 @@ class BookingServiceIntegrationTest {
     private final ItemService itemService;
     @Autowired
     private final BookingService bookingService;
+    private final Booking booking = new Booking(null, LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(2), null, null, null);
     private User user = new User(null, "User", "user@email.com");
     private User booker = new User(null, "Booker", "booker@emaul.com");
     private Item item = new Item(null, "Item", "Description", true, null, null);
-    private final Booking booking = new Booking(null, LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(2), null, null, null);
     private BookingInfoDto createdBooking;
 
     @BeforeEach
