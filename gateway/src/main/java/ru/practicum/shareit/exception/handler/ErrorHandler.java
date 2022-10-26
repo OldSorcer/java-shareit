@@ -44,7 +44,7 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, String> handle (final IllegalArgumentException exc) {
+    public Map<String, String> handle(final IllegalArgumentException exc) {
         log.warn("[x] Возникла ошибка при валидации данных: {}", exc.getMessage());
         return Map.of("error", exc.getMessage());
     }
